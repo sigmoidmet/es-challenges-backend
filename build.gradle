@@ -1,0 +1,56 @@
+plugins {
+    id 'java'
+}
+
+group = 'net.opensource'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    springBootVersion = '3.3.1'
+    mapstructVersion = '1.5.5.Final'
+    
+    lombokVersion = '1.18.32'
+
+    junitVersion = '5.10.0'
+    testcontainersVersion = '1.19.8'
+}
+
+dependencies {
+    implementation(
+            platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"),
+            "org.springframework.boot:spring-boot-starter",
+            "org.springframework.boot:spring-boot-starter-web",
+            "org.springframework.boot:spring-boot-starter-data-elasticsearch",
+            "org.mapstruct:mapstruct:$mapstructVersion"
+    )
+
+    compileOnly("org.projectlombok:lombok:$lombokVersion")
+    testCompileOnly("org.projectlombok:lombok:$lombokVersion")
+    annotationProcessor(
+            "org.projectlombok:lombok:$lombokVersion",
+            "org.mapstruct:mapstruct-processor:$mapstructVersion",
+    )
+    testAnnotationProcessor("org.projectlombok:lombok:$lombokVersion")
+
+    testImplementation(
+            platform("org.junit:junit-bom:$junitVersion"),
+            "org.junit.jupiter:junit-jupiter",
+            "org.springframework.boot:spring-boot-starter-test",
+            "org.springframework.boot:spring-boot-starter-webflux",
+            "org.testcontainers:testcontainers:$testcontainersVersion",
+            "org.testcontainers:elasticsearch:$testcontainersVersion",
+    )
+}
+
+test {
+    useJUnitPlatform()
+    systemProperty "useLocalElasticsearch", System.getProperty("useLocalElasticsearch")
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs.add("-parameters")
+}

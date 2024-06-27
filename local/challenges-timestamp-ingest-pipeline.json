@@ -1,0 +1,10 @@
+{
+  "processors": [
+    {
+      "set": {
+        "field": "timestamp",
+        "value": "{{_ingest.timestamp}}"
+      }
+    }
+  ]
+}
