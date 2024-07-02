@@ -1,42 +1,44 @@
-package net.burndmg.eschallenges.repository;
+package net.burndmg.eschallenges.repository.common;
 
 import lombok.RequiredArgsConstructor;
 import net.burndmg.eschallenges.data.dto.Page;
 import net.burndmg.eschallenges.data.dto.PageSettings;
-import net.burndmg.eschallenges.data.model.TimestampBasedSortable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.Query;
-import org.springframework.data.elasticsearch.core.query.StringQuery;
 
 import java.util.List;
 
+import static net.burndmg.eschallenges.data.model.TimestampBasedSortable.TIMESTAMP_FIELD;
+import static net.burndmg.eschallenges.infrastructure.util.RepositoryProjectionUtil.queryBuilderWithProjectionFor;
+
 
 @RequiredArgsConstructor
-public class PaginationRepositoryImpl<T extends TimestampBasedSortable> implements PaginationRepository<T> {
+public class PaginationRepositoryImpl implements PaginationRepository {
 
     private final ElasticsearchOperations elasticsearchOperations;
 
     @Override
-    public Page<T> findAllAfter(PageSettings pageSettings, Class<T> type) {
-        Sort sortByTimestamp = Sort.by("timestamp");
+    public <T> Page<T> findAllAfter(PageSettings pageSettings, Class<T> projectionType, IndexCoordinates indexCoordinates) {
+        Sort sortByTimestamp = Sort.by(TIMESTAMP_FIELD);
 
         if (pageSettings.direction().isDescending()) {
             sortByTimestamp = sortByTimestamp.descending();
         }
 
-        Query query = StringQuery.builder(StringQuery.MATCH_ALL)
+        Query query = queryBuilderWithProjectionFor(projectionType)
+                                 .withQuery(Query.findAll())
                                  .withMaxResults(pageSettings.size())
-                                 .build()
-                                 .addSort(sortByTimestamp);
+                                 .withSort(sortByTimestamp)
+                                 .withSearchAfter(pageSettings.searchAfter() == null ?
+                                                          List.of() :
+                                                          List.of(pageSettings.searchAfter()))
+                                 .build();
 
-        if (pageSettings.searchAfter() != null) {
-            query.setSearchAfter(List.of(pageSettings.searchAfter()));
-        }
-
-        SearchHits<T> result = elasticsearchOperations.search(query, type);
+        SearchHits<T> result = elasticsearchOperations.search(query, projectionType, indexCoordinates);
 
         return Page.<T>builder()
                    .result(result.stream().map(SearchHit::getContent).toList())
@@ -46,7 +48,7 @@ public class PaginationRepositoryImpl<T extends TimestampBasedSortable> implemen
                    .build();
     }
 
-    private static <T extends TimestampBasedSortable> Long toLastSortValue(SearchHits<T> result) {
+    private static <T> Long toLastSortValue(SearchHits<T> result) {
         if (result.isEmpty()) {
             return null;
         }

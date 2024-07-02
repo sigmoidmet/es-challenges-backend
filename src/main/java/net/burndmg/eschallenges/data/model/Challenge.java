@@ -6,7 +6,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.util.List;
 
-@Document(indexName = "challenges")
+@Document(indexName = Challenge.INDEX_NAME, createIndex = false)
 @Builder
 public record Challenge (
 
@@ -17,9 +17,14 @@ public record Challenge (
 
         String description,
 
-        List<String> examples,
-
         String indexSettings,
 
+        List<String> testsDataJson,
+
+        List<ChallengeExample> examples,
+
         String timestamp
-) implements TimestampBasedSortable {}
+) implements TimestampBasedSortable {
+
+        public static final String INDEX_NAME = "challenges";
+}
