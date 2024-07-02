@@ -11,6 +11,7 @@ repositories {
 
 ext {
     springBootVersion = '3.3.1'
+    elasticEvolutionVersion = '0.6.0'
     mapstructVersion = '1.5.5.Final'
     
     lombokVersion = '1.18.32'
@@ -25,6 +26,8 @@ dependencies {
             "org.springframework.boot:spring-boot-starter",
             "org.springframework.boot:spring-boot-starter-web",
             "org.springframework.boot:spring-boot-starter-data-elasticsearch",
+            "com.senacor.elasticsearch.evolution:spring-boot-starter-elasticsearch-evolution:$elasticEvolutionVersion",
+
             "org.mapstruct:mapstruct:$mapstructVersion"
     )
 

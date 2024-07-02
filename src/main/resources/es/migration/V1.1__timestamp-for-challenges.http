@@ -1,3 +1,6 @@
+PUT challenges/_settings
+Content-Type: application/json
+
 {
   "settings": {
     "index.default_pipeline": "add-timestamp"

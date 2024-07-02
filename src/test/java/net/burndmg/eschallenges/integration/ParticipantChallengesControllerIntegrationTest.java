@@ -15,13 +15,7 @@ public class ParticipantChallengesControllerIntegrationTest extends IntegrationT
         Challenge first = testIndexer.indexRandomChallengeAndReturnIt("1");
         Challenge second = testIndexer.indexRandomChallengeAndReturnIt("2");
 
-        webTestClient
-                .get()
-                .uri("/challenges")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().is2xxSuccessful()
-                .expectBody()
+        getSuccessful("/challenges")
                 .jsonPath("$.challenges.total").isEqualTo(2)
                 .jsonPath("$.challenges.size").isEqualTo(2)
                 .jsonPath("$.challenges.lastSortValue").exists()
@@ -38,13 +32,7 @@ public class ParticipantChallengesControllerIntegrationTest extends IntegrationT
         Challenge first = testIndexer.indexRandomChallengeAndReturnIt("1");
         Challenge second = testIndexer.indexRandomChallengeAndReturnIt("2");
 
-        webTestClient
-                .get()
-                .uri("/challenges?direction=DESC")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().is2xxSuccessful()
-                .expectBody()
+        getSuccessful("/challenges?direction=DESC")
                 .jsonPath("$.challenges.total").isEqualTo(2)
                 .jsonPath("$.challenges.size").isEqualTo(2)
                 .jsonPath("$.challenges.lastSortValue").exists()
@@ -62,13 +50,7 @@ public class ParticipantChallengesControllerIntegrationTest extends IntegrationT
 
         testIndexer.indexRandomChallengeAndReturnIt("2");
 
-        webTestClient
-                .get()
-                .uri("/challenges?size=1")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().is2xxSuccessful()
-                .expectBody()
+        getSuccessful("/challenges?size=1")
                 .jsonPath("$.challenges.total").isEqualTo(2)
                 .jsonPath("$.challenges.size").isEqualTo(1)
                 .jsonPath("$.challenges.lastSortValue").exists()
@@ -82,25 +64,11 @@ public class ParticipantChallengesControllerIntegrationTest extends IntegrationT
         testIndexer.indexRandomChallengeAndReturnIt("1");
         Challenge second = testIndexer.indexRandomChallengeAndReturnIt("2");
 
-        ParticipantChallengePage firstResponseBody = webTestClient
-                .get()
-                .uri("/challenges?size=1")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().is2xxSuccessful()
-                .expectBody(ParticipantChallengePage.class)
-                .returnResult()
-                .getResponseBody();
+        ParticipantChallengePage firstResponseBody = getSuccessful("/challenges?size=1", ParticipantChallengePage.class);
 
         assertNotNull(firstResponseBody);
 
-        webTestClient
-                .get()
-                .uri("/challenges?size=1&searchAfter=" + firstResponseBody.challenges().lastSortValue())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().is2xxSuccessful()
-                .expectBody()
+        getSuccessful("/challenges?size=1&searchAfter=" + firstResponseBody.challenges().lastSortValue())
                 .jsonPath("$.challenges.total").isEqualTo(2)
                 .jsonPath("$.challenges.size").isEqualTo(1)
                 .jsonPath("$.challenges.lastSortValue").exists()
@@ -126,13 +94,7 @@ public class ParticipantChallengesControllerIntegrationTest extends IntegrationT
 
         assertNotNull(firstResponseBody);
 
-        webTestClient
-                .get()
-                .uri("/challenges?size=1&searchAfter=" + firstResponseBody.challenges().lastSortValue())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().is2xxSuccessful()
-                .expectBody()
+        getSuccessful("/challenges?size=1&searchAfter=" + firstResponseBody.challenges().lastSortValue())
                 .jsonPath("$.challenges.total").isEqualTo(2)
                 .jsonPath("$.challenges.size").isEqualTo(0)
                 .jsonPath("$.challenges.result").isEmpty();
@@ -142,13 +104,7 @@ public class ParticipantChallengesControllerIntegrationTest extends IntegrationT
     void challengeById_whenIdExists_shouldReturnChallenge() {
         Challenge challenge = testIndexer.indexRandomChallengeAndReturnIt("1");
 
-        webTestClient
-                .get()
-                .uri("/challenges/1")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().is2xxSuccessful()
-                .expectBody()
+        getSuccessful("/challenges/1")
                 .jsonPath("$.id").isEqualTo(challenge.id())
                 .jsonPath("$.title").isEqualTo(challenge.title())
                 .jsonPath("$.description").isEqualTo(challenge.description());

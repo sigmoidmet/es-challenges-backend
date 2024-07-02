@@ -1,3 +1,6 @@
+PUT _ingest/pipeline/add-timestamp
+Content-Type: application/json
+
 {
   "processors": [
     {

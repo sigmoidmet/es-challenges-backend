@@ -21,6 +21,15 @@ public class ConditionalElasticsearchContainer extends ElasticsearchContainer {
         }
     }
 
+    @Override
+    public String getHttpHostAddress() {
+        if (shouldUseLocallyRunningElasticsearch()) {
+            return "http://localhost:9200";
+        }
+
+        return super.getHttpHostAddress();
+    }
+
     private boolean shouldUseLocallyRunningElasticsearch() {
         return Boolean.parseBoolean(System.getProperty("useLocalElasticsearch"));
     }
