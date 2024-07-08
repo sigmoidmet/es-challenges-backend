@@ -28,4 +28,8 @@ public class TestIndexer {
 
         return challenge;
     }
+
+    public Challenge indexChallenge(Challenge challenge) {
+        return challengeRepository.save(challenge);
+    }
 }

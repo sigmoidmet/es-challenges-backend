@@ -1,4 +1,4 @@
-package net.burndmg.eschallenges.data.dto;
+package net.burndmg.eschallenges.data.dto.participant;
 
 import lombok.Builder;
 

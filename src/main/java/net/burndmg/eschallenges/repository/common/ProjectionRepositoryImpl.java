@@ -20,7 +20,7 @@ public class ProjectionRepositoryImpl implements ProjectionRepository {
     @Override
     public <T> Optional<T> findById(String id, Class<T> projectionType, IndexCoordinates indexCoordinates) {
         Query query = queryBuilderWithProjectionFor(projectionType)
-                .withQuery(CriteriaQuery.builder(Criteria.where("id").is(id)).build())
+                .withQuery(CriteriaQuery.builder(Criteria.where("_id").is(id)).build())
                 .build();
         SearchHit<T> searchHit = elasticsearchOperations.searchOne(query, projectionType, indexCoordinates);
 

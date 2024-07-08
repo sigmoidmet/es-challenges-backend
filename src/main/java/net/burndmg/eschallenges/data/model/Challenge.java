@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.util.List;
+import java.util.Map;
 
 @Document(indexName = Challenge.INDEX_NAME, createIndex = false)
 @Builder
@@ -17,9 +18,11 @@ public record Challenge (
 
         String description,
 
-        String indexSettings,
+        Map<String, Object> indexSettings,
 
-        List<String> testsDataJson,
+        String idealRequest,
+
+        List<Map<String, Object>> testsDataJson,
 
         List<ChallengeExample> examples,
 

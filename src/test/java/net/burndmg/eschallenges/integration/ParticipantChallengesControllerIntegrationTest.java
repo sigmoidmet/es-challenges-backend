@@ -1,6 +1,6 @@
 package net.burndmg.eschallenges.integration;
 
-import net.burndmg.eschallenges.data.dto.ParticipantChallengePage;
+import net.burndmg.eschallenges.data.dto.participant.ParticipantChallengePage;
 import net.burndmg.eschallenges.data.model.Challenge;
 import net.burndmg.eschallenges.integration.util.IntegrationTestBase;
 import org.junit.jupiter.api.Test;

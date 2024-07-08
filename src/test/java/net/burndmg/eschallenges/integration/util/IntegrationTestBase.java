@@ -45,5 +45,14 @@ public abstract class IntegrationTestBase implements ElasticsearchAware {
                 .expectBody();
     }
 
-
+    protected WebTestClient.BodyContentSpec postSuccessful(String path, Object body) {
+        return webTestClient
+                .post()
+                .uri(path)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(body)
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody();
+    }
 }

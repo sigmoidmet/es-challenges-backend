@@ -1,12 +1,13 @@
-package net.burndmg.eschallenges.data.dto;
+package net.burndmg.eschallenges.data.dto.participant;
 
 import java.util.List;
+import java.util.Map;
 
 public record ParticipantChallenge (
         String id,
         String title,
         String description,
         List<String> examples,
-        String indexSettings
+        Map<String, Object> indexSettings
 ) {
 }

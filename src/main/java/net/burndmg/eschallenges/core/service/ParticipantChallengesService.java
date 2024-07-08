@@ -1,10 +1,10 @@
-package net.burndmg.eschallenges.service;
+package net.burndmg.eschallenges.core.service;
 
 import lombok.RequiredArgsConstructor;
 import net.burndmg.eschallenges.data.dto.PageSettings;
-import net.burndmg.eschallenges.data.dto.ParticipantChallenge;
-import net.burndmg.eschallenges.data.dto.ParticipantChallengePage;
-import net.burndmg.eschallenges.data.dto.ParticipantChallengePreview;
+import net.burndmg.eschallenges.data.dto.participant.ParticipantChallenge;
+import net.burndmg.eschallenges.data.dto.participant.ParticipantChallengePage;
+import net.burndmg.eschallenges.data.dto.participant.ParticipantChallengePreview;
 import net.burndmg.eschallenges.infrastructure.expection.instance.NotFoundException;
 import net.burndmg.eschallenges.repository.ChallengeRepository;
 import org.springframework.stereotype.Service;
