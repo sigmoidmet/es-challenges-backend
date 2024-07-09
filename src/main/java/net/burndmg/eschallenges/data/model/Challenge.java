@@ -1,6 +1,7 @@
 package net.burndmg.eschallenges.data.model;
 
 import lombok.Builder;
+import lombok.Singular;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
@@ -22,7 +23,8 @@ public record Challenge (
 
         String idealRequest,
 
-        List<Map<String, Object>> testsDataJson,
+        @Singular
+        List<ChallengeTest> challengeTests,
 
         List<ChallengeExample> examples,
 

@@ -1,8 +1,10 @@
 package net.burndmg.eschallenges.integration;
 
 import lombok.SneakyThrows;
+import net.burndmg.eschallenges.data.dto.run.RunRequest;
 import net.burndmg.eschallenges.data.dto.tryrun.TryRunRequest;
 import net.burndmg.eschallenges.data.model.Challenge;
+import net.burndmg.eschallenges.data.model.ChallengeTest;
 import net.burndmg.eschallenges.integration.util.IntegrationTestBase;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -50,6 +52,55 @@ public class ChallengeAcceptanceConcurrencyIntegrationTest extends IntegrationTe
         );
         CompletableFuture<WebTestClient.ResponseSpec> future2 = CompletableFuture.supplyAsync(
                 () -> post("/challenges/" + challenge.id() + "/acceptances/try-run", tryRunRequest)
+        );
+
+        Set<Integer> expectedStatuses = new HashSet<>(Set.of(HttpStatus.TOO_MANY_REQUESTS.value(), HttpStatus.OK.value()));
+
+
+        CompletableFuture.allOf(future1, future2).join();
+
+        future1.get().expectStatus().value(expectedStatuses::remove);
+        future2.get().expectStatus().value(expectedStatuses::remove);
+
+        assertTrue(expectedStatuses.isEmpty());
+    }
+
+    // TODO: can flicker potentially, for now it hasn't happened but if it will we may use some RetryingTest to minimize flickering
+    @Test
+    @SneakyThrows
+    void run_whenTwoSimultaneousRequestsByTheSameUser_shouldFailOne() {
+        String request = """
+                 {
+                     "query": {
+                       "term": {
+                         "name.keyword": {
+                           "value": "Nikola"
+                         }
+                       }
+                     }
+                 }
+                """;
+        RunRequest runRequest = new RunRequest(request);
+
+        Challenge challenge = testIndexer.indexChallenge(Challenge.builder()
+                                                                  .title("Find Nikola!")
+                                                                  .idealRequest(request)
+                                                                  .challengeTest(new ChallengeTest(List.of(
+                                                                          Map.of("name", "Minh"),
+                                                                          Map.of("name", "Khai")
+                                                                  )))
+                                                                  .challengeTest(new ChallengeTest(List.of(
+                                                                          Map.of("name", "Nikola"),
+                                                                          Map.of("name", "Andrijana")
+                                                                 )))
+                                                                  .build());
+
+
+        CompletableFuture<WebTestClient.ResponseSpec> future1 = CompletableFuture.supplyAsync(
+                () -> post("/challenges/" + challenge.id() + "/acceptances/run", runRequest)
+        );
+        CompletableFuture<WebTestClient.ResponseSpec> future2 = CompletableFuture.supplyAsync(
+                () -> post("/challenges/" + challenge.id() + "/acceptances/run", runRequest)
         );
 
         Set<Integer> expectedStatuses = new HashSet<>(Set.of(HttpStatus.TOO_MANY_REQUESTS.value(), HttpStatus.OK.value()));

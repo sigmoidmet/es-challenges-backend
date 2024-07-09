@@ -2,12 +2,16 @@ package net.burndmg.eschallenges.core.service;
 
 import lombok.RequiredArgsConstructor;
 import net.burndmg.eschallenges.core.ChallengeRunner;
-import net.burndmg.eschallenges.data.dto.run.ChallengeRunConfiguration;
-import net.burndmg.eschallenges.data.dto.run.ChallengeRunResult;
+import net.burndmg.eschallenges.data.dto.run.*;
 import net.burndmg.eschallenges.data.dto.tryrun.ChallengeForTryRun;
-import net.burndmg.eschallenges.data.dto.tryrun.TryRunData;
+import net.burndmg.eschallenges.data.dto.tryrun.ChallengeTryRunData;
 import net.burndmg.eschallenges.data.dto.tryrun.TryRunResponse;
+import net.burndmg.eschallenges.data.model.ChallengeAcceptance;
+import net.burndmg.eschallenges.data.model.ChallengeAcceptanceFailedTest;
+import net.burndmg.eschallenges.data.model.ChallengeTest;
 import net.burndmg.eschallenges.infrastructure.expection.instance.NotFoundException;
+import net.burndmg.eschallenges.map.ChallengeAcceptanceMapper;
+import net.burndmg.eschallenges.repository.ChallengeAcceptanceRepository;
 import net.burndmg.eschallenges.repository.ChallengeRepository;
 import org.springframework.stereotype.Service;
 
@@ -16,18 +20,20 @@ import org.springframework.stereotype.Service;
 public class ChallengeAcceptanceService {
 
     private final ChallengeRepository challengeRepository;
+    private final ChallengeAcceptanceRepository challengeAcceptanceRepository;
     private final ChallengeRunner challengeRunner;
+    private final ChallengeAcceptanceMapper challengeAcceptanceMapper;
 
-    public TryRunResponse tryRun(TryRunData tryRunData) {
-        ChallengeForTryRun challenge = getChallengeById(tryRunData.challengeId());
+    public TryRunResponse tryRunChallenge(ChallengeTryRunData challengeTryRunData) {
+        ChallengeForTryRun challenge = getChallengeById(challengeTryRunData.challengeId(), ChallengeForTryRun.class);
 
         ChallengeRunResult runResult = challengeRunner.run(
                 ChallengeRunConfiguration.builder()
-                                         .indexName(tryRunData.username())
+                                         .indexName(challengeTryRunData.username())
                                          .indexSettings(challenge.indexSettings())
-                                         .indexedData(tryRunData.indexedData())
+                                         .indexedData(challengeTryRunData.indexedData())
                                          .idealRequest(challenge.idealRequest())
-                                         .userRequest(tryRunData.request())
+                                         .userRequest(challengeTryRunData.request())
                                          .build()
         );
 
@@ -38,8 +44,62 @@ public class ChallengeAcceptanceService {
                              .build();
     }
 
-    private ChallengeForTryRun getChallengeById(String id) {
-        return challengeRepository.findById(id, ChallengeForTryRun.class)
+    public ChallengeAcceptanceDto runChallenge(ChallengeRunData runData) {
+        ChallengeForRun challenge = getChallengeById(runData.challengeId(), ChallengeForRun.class);
+
+        ChallengeRunResult lastRunResult = null;
+        
+        for (ChallengeTest challengeTest : challenge.challengeTests()) {
+            lastRunResult = challengeRunner.run(
+                    ChallengeRunConfiguration.builder()
+                                             .indexName(runData.username())
+                                             .indexSettings(challenge.indexSettings())
+                                             .indexedData(challengeTest.dataJson())
+                                             .idealRequest(challenge.idealRequest())
+                                             .userRequest(runData.request())
+                                             .build()
+            );
+            
+            if (!isSuccessful(lastRunResult)) {
+                break;
+            }
+        }
+        
+        
+
+
+        return saveAcceptance(runData, lastRunResult);
+    }
+    
+    private ChallengeAcceptanceDto saveAcceptance(ChallengeRunData runData, ChallengeRunResult runResult) {
+        boolean successful = isSuccessful(runResult);
+        var failedTest = successful ?
+                null :
+                ChallengeAcceptanceFailedTest.builder()
+                                             .testDataJson(runResult.indexedDataJson())
+                                             .actualOutput(runResult.actualResult())
+                                             .expectedOutput(runResult.expectedResult())
+                                             .build();
+
+        return challengeAcceptanceMapper.toDto(challengeAcceptanceRepository.save(
+                ChallengeAcceptance
+                        .builder()
+                        .challengeId(runData.challengeId())
+                        .request(runData.request())
+                        .failedTest(failedTest)
+                        .username(runData.username())
+                        .successful(successful)
+                        .build()
+        ));
+        
+    }
+
+    private <T> T getChallengeById(String id, Class<T> type) {
+        return challengeRepository.findById(id, type)
                                   .orElseThrow(() -> new NotFoundException("There is no challenge by id " + id));
+    }
+    
+    private boolean isSuccessful(ChallengeRunResult runResult) {
+        return runResult.expectedResult().equals(runResult.actualResult());
     }
 }

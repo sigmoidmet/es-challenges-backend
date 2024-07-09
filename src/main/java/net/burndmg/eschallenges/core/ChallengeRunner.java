@@ -28,6 +28,7 @@ public class ChallengeRunner {
             challengeRunRepository.saveAll(indexName, configuration.indexedData());
             return ChallengeRunResult
                     .builder()
+                    .indexedDataJson(configuration.indexedData())
                     .expectedResult(challengeRunRepository.search(indexName, configuration.idealRequest()))
                     .actualResult(challengeRunRepository.search(indexName, configuration.userRequest()))
                     .build();

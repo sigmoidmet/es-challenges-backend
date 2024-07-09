@@ -7,6 +7,7 @@ import java.util.Map;
 
 @Builder
 public record ChallengeRunResult(
+        List<Map<String, Object>> indexedDataJson,
         List<Map<String, Object>> expectedResult,
         List<Map<String, Object>> actualResult
 ) {}

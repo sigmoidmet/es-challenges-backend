@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 import java.util.Map;
 
-public class ChallengeAcceptanceControllerIntegrationTest extends IntegrationTestBase {
+public class ChallengeAcceptanceTryRunIntegrationTest extends IntegrationTestBase {
 
     @Test
     void tryRun_whenSentIdealRequest_shouldSucceed() {
