@@ -133,8 +133,8 @@ public class ChallengeAcceptanceTryRunIntegrationTest extends IntegrationTestBas
 
 
         postSuccessful("/challenges/" + challenge.id() + "/acceptances/try-run", tryRunRequest)
-                .jsonPath("$.expectedResponse[0].name").isEqualTo("Dmitry")
-                .jsonPath("$.actualResponse[0].name").isEqualTo("Maria")
+                .jsonPath("$.expectedResponse[0].name").isEqualTo("Andrijana")
+                .jsonPath("$.actualResponse[0].name").isEqualTo("Nikola")
                 .jsonPath("$.isSuccessful").isEqualTo("false");
     }
 

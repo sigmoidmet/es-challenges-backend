@@ -15,7 +15,7 @@ public class TestIndexer {
     private final ChallengeRepository challengeRepository;
 
     public void cleanUpIndex() {
-        challengeRepository.deleteAll();
+        challengeRepository.deleteAll(RefreshPolicy.IMMEDIATE).block();
     }
 
     public Challenge indexRandomChallengeAndReturnIt(String id) {
@@ -24,12 +24,12 @@ public class TestIndexer {
                                        .title(UUID.randomUUID().toString())
                                        .description(UUID.randomUUID().toString())
                                        .build();
-        challenge = challengeRepository.save(challenge, RefreshPolicy.IMMEDIATE);
+        challenge = indexChallenge(challenge);
 
         return challenge;
     }
 
     public Challenge indexChallenge(Challenge challenge) {
-        return challengeRepository.save(challenge);
+        return challengeRepository.save(challenge, RefreshPolicy.IMMEDIATE).block();
     }
 }

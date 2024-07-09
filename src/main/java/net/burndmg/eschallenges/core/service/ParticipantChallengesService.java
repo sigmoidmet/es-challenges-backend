@@ -8,6 +8,7 @@ import net.burndmg.eschallenges.data.dto.participant.ParticipantChallengePreview
 import net.burndmg.eschallenges.infrastructure.expection.instance.NotFoundException;
 import net.burndmg.eschallenges.repository.ChallengeRepository;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -15,16 +16,15 @@ public class ParticipantChallengesService {
 
     private final ChallengeRepository challengeRepository;
 
-    public ParticipantChallenge getChallengeById(String id) {
-
+    public Mono<ParticipantChallenge> getChallengeById(String id) {
         return challengeRepository.findById(id, ParticipantChallenge.class)
-                                  .orElseThrow(() -> new NotFoundException("There is no challenge by id " + id));
+                                  .switchIfEmpty(Mono.error(new NotFoundException("There is no challenge by id " + id)));
     }
 
-    public ParticipantChallengePage getChallengeView(PageSettings pageSettings) {
-        return ParticipantChallengePage
-                .builder()
-                .challenges(challengeRepository.findAllAfter(pageSettings, ParticipantChallengePreview.class))
-                .build();
+    public Mono<ParticipantChallengePage> getChallengeView(PageSettings pageSettings) {
+        return challengeRepository.findAllAfter(pageSettings, ParticipantChallengePreview.class)
+                                  .map(challenges -> ParticipantChallengePage.builder()
+                                                                             .challenges(challenges)
+                                                                             .build());
     }
 }

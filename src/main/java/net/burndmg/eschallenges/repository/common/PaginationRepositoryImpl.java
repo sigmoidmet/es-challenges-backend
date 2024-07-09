@@ -4,25 +4,28 @@ import lombok.RequiredArgsConstructor;
 import net.burndmg.eschallenges.data.dto.Page;
 import net.burndmg.eschallenges.data.dto.PageSettings;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.ReactiveElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.ReactiveSearchHits;
 import org.springframework.data.elasticsearch.core.SearchHit;
-import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.Query;
+import reactor.core.publisher.Mono;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 import static net.burndmg.eschallenges.data.model.TimestampBasedSortable.TIMESTAMP_FIELD;
 import static net.burndmg.eschallenges.infrastructure.util.RepositoryProjectionUtil.queryBuilderWithProjectionFor;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 
 @RequiredArgsConstructor
 public class PaginationRepositoryImpl implements PaginationRepository {
 
-    private final ElasticsearchOperations elasticsearchOperations;
+    private final ReactiveElasticsearchOperations elasticsearchOperations;
 
     @Override
-    public <T> Page<T> findAllAfter(PageSettings pageSettings, Class<T> projectionType, IndexCoordinates indexCoordinates) {
+    public <T> Mono<Page<T>> findAllAfter(PageSettings pageSettings, Class<T> projectionType, IndexCoordinates indexCoordinates) {
         Sort sortByTimestamp = Sort.by(TIMESTAMP_FIELD);
 
         if (pageSettings.direction().isDescending()) {
@@ -38,23 +41,35 @@ public class PaginationRepositoryImpl implements PaginationRepository {
                                                           List.of(pageSettings.searchAfter()))
                                  .build();
 
-        SearchHits<T> result = elasticsearchOperations.search(query, projectionType, indexCoordinates);
-
-        return Page.<T>builder()
-                   .result(result.stream().map(SearchHit::getContent).toList())
-                   .size(result.getSearchHits().size())
-                   .lastSortValue(toLastSortValue(result))
-                   .total(result.getTotalHits())
-                   .build();
+        return elasticsearchOperations
+                .searchForHits(query, projectionType, indexCoordinates)
+                .map(PaginationRepositoryImpl::toPage);
     }
 
-    private static <T> Long toLastSortValue(SearchHits<T> result) {
-        if (result.isEmpty()) {
+    private static <T> Page<T> toPage(ReactiveSearchHits<T> result) {
+        List<SearchHit<T>> hits = result.getSearchHits()
+                                        .collectList()
+                                        .block();
+
+        if (hits == null) {
             return null;
         }
 
-        return (Long) result.getSearchHit(result.getSearchHits().size() - 1)
-                            .getSortValues()
-                            .get(0);
+        return Page.<T>builder()
+                   .result(hits.stream().map(SearchHit::getContent).toList())
+                   .size(hits.size())
+                   .total(result.getTotalHits())
+                   .lastSortValue(toLastSortValue(hits))
+                   .build();
+    }
+
+    private static <T> Long toLastSortValue(@Nullable List<SearchHit<T>> hits) {
+        if (isEmpty(hits)) {
+            return null;
+        }
+
+        return (Long) hits.get(hits.size() - 1)
+                          .getSortValues()
+                          .get(0);
     }
 }

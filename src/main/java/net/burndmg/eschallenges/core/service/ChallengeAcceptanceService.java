@@ -1,6 +1,7 @@
 package net.burndmg.eschallenges.core.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import net.burndmg.eschallenges.core.ChallengeRunner;
 import net.burndmg.eschallenges.data.dto.run.*;
 import net.burndmg.eschallenges.data.dto.tryrun.ChallengeForTryRun;
@@ -14,6 +15,7 @@ import net.burndmg.eschallenges.map.ChallengeAcceptanceMapper;
 import net.burndmg.eschallenges.repository.ChallengeAcceptanceRepository;
 import net.burndmg.eschallenges.repository.ChallengeRepository;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -94,9 +96,12 @@ public class ChallengeAcceptanceService {
         
     }
 
+    @SneakyThrows
     private <T> T getChallengeById(String id, Class<T> type) {
         return challengeRepository.findById(id, type)
-                                  .orElseThrow(() -> new NotFoundException("There is no challenge by id " + id));
+                                  .switchIfEmpty(Mono.error(new NotFoundException("There is no challenge by id " + id)))
+                                  .toFuture()
+                                  .get();
     }
     
     private boolean isSuccessful(ChallengeRunResult runResult) {

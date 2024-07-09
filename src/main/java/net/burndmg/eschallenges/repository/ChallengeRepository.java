@@ -6,19 +6,18 @@ import net.burndmg.eschallenges.data.model.Challenge;
 import net.burndmg.eschallenges.repository.common.PaginationRepository;
 import net.burndmg.eschallenges.repository.common.ProjectionRepository;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
-import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
+import org.springframework.data.elasticsearch.repository.ReactiveElasticsearchRepository;
+import reactor.core.publisher.Mono;
 
-import java.util.Optional;
-
-public interface ChallengeRepository extends ElasticsearchRepository<Challenge, String>, PaginationRepository, ProjectionRepository {
+public interface ChallengeRepository extends ReactiveElasticsearchRepository<Challenge, String>, PaginationRepository, ProjectionRepository {
 
     IndexCoordinates INDEX = IndexCoordinates.of(Challenge.INDEX_NAME);
 
-    default <T> Optional<T> findById(String id, Class<T> projectionType) {
+    default <T> Mono<T> findById(String id, Class<T> projectionType) {
         return findById(id, projectionType, INDEX);
     }
 
-    default <T> Page<T> findAllAfter(PageSettings pageSettings, Class<T> projectionType) {
+    default <T> Mono<Page<T>> findAllAfter(PageSettings pageSettings, Class<T> projectionType) {
         return findAllAfter(pageSettings, projectionType, INDEX);
     }
 }

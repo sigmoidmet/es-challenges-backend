@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("challenges")
@@ -18,12 +19,12 @@ public class ParticipantChallengesController {
     private final ParticipantChallengesService challengesService;
 
     @GetMapping("{id}")
-    public ParticipantChallenge challengeById(@PathVariable String id) {
+    public Mono<ParticipantChallenge> challengeById(@PathVariable String id) {
         return challengesService.getChallengeById(id);
     }
 
     @GetMapping
-    public ParticipantChallengePage participantChallenges(PageSettings pageSettings) {
+    public Mono<ParticipantChallengePage> participantChallenges(PageSettings pageSettings) {
         return challengesService.getChallengeView(pageSettings);
     }
 }
