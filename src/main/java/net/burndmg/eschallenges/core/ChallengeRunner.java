@@ -1,16 +1,15 @@
 package net.burndmg.eschallenges.core;
 
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.burndmg.eschallenges.data.dto.run.ChallengeRunConfiguration;
 import net.burndmg.eschallenges.data.dto.run.ChallengeRunResult;
 import net.burndmg.eschallenges.infrastructure.expection.instance.ConcurrentChallengeRunException;
 import net.burndmg.eschallenges.repository.ChallengeRunRepository;
-import org.springframework.data.elasticsearch.NoSuchIndexException;
 import org.springframework.data.elasticsearch.UncategorizedElasticsearchException;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -19,36 +18,44 @@ public class ChallengeRunner {
 
     private final ChallengeRunRepository challengeRunRepository;
 
-    public ChallengeRunResult run(ChallengeRunConfiguration configuration) {
+    public Mono<ChallengeRunResult> run(ChallengeRunConfiguration configuration) {
         String indexName = configuration.indexName();
 
-        createAndValidateIndex(indexName, configuration.indexSettings());
+        return challengeRunRepository
+                .createIndex(indexName, configuration.indexSettings())
+                .onErrorMap(UncategorizedElasticsearchException.class, this::catchConcurrentChallengeRun)
 
-        try {
-            challengeRunRepository.saveAll(indexName, configuration.indexedData());
-            return ChallengeRunResult
-                    .builder()
-                    .indexedDataJson(configuration.indexedData())
-                    .expectedResult(challengeRunRepository.search(indexName, configuration.idealRequest()))
-                    .actualResult(challengeRunRepository.search(indexName, configuration.userRequest()))
-                    .build();
-        } catch (NoSuchIndexException e) {
-            log.warn("The index {} was deleted during the challenge running, Retrying...", indexName);
-            return run(configuration);
-        } finally {
-            challengeRunRepository.tryDeleteIndex(indexName);
-        }
+                // We need to execute index creation -> data indexing -> searching in this particular order, so we're deferring these operations
+                .then(Mono.defer(() -> challengeRunRepository.saveAll(indexName, configuration.indexedData())))
+                .then(Mono.defer(() -> Mono.zip(challengeRunRepository.search(indexName, configuration.idealRequest()),
+                                                challengeRunRepository.search(indexName, configuration.userRequest()))))
+
+                .map(tuple -> ChallengeRunResult.builder()
+                                                .indexedDataJson(configuration.indexedData())
+                                                .expectedResult(tuple.getT1())
+                                                .actualResult(tuple.getT2())
+                                                .build())
+                .doOnError(this::isIndexNotFound,
+                           __ -> log.warn("The index {} was deleted during the challenge running. Retrying...",
+                                          indexName))
+                .onErrorResume(this::isIndexNotFound, __ -> run(configuration))
+
+                // We want to clean up this index in case of:
+                // 1. a success(which means that we also need to do it before returning the value as we can get the subsequent run afterward)
+                // 2. after any unhandled exceptions
+                .onErrorResume(e -> challengeRunRepository.deleteIndex(indexName).then(Mono.error(e)))
+                .flatMap(runResult -> challengeRunRepository.deleteIndex(indexName).thenReturn(runResult));
     }
 
-    private void createAndValidateIndex(String indexName, Map<String, Object> indexSettings) {
-        try {
-            challengeRunRepository.tryCreateIndex(indexName, indexSettings);
-        } catch (UncategorizedElasticsearchException e) {
-            if (e.getMessage().contains("resource_already_exists_exception")) {
-                throw new ConcurrentChallengeRunException("You can't run more than one challenge simultaneously.");
-            }
-            throw e;
+    private RuntimeException catchConcurrentChallengeRun(UncategorizedElasticsearchException e) {
+        if (e.getMessage().contains("resource_already_exists_exception")) {
+            return new ConcurrentChallengeRunException("You can't run more than one challenge simultaneously.");
         }
+        return e;
+    }
 
+    private boolean isIndexNotFound(Throwable e) {
+       return e instanceof ElasticsearchException &&
+              e.getMessage().contains("index_not_found_exception");
     }
 }

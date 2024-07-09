@@ -9,6 +9,7 @@ import net.burndmg.eschallenges.data.dto.tryrun.ChallengeTryRunData;
 import net.burndmg.eschallenges.data.dto.tryrun.TryRunRequest;
 import net.burndmg.eschallenges.data.dto.tryrun.TryRunResponse;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("challenges/{id}/acceptances")
@@ -18,7 +19,7 @@ public class ChallengeAcceptanceController {
     private final ChallengeAcceptanceService challengeAcceptanceService;
 
     @PostMapping("try-run")
-    public TryRunResponse tryRun(@PathVariable String id, @RequestBody TryRunRequest tryRunRequest) {
+    public Mono<TryRunResponse> tryRun(@PathVariable String id, @RequestBody TryRunRequest tryRunRequest) {
         // TODO: implement username properly once security would be enabled
         return challengeAcceptanceService.tryRunChallenge(
                 ChallengeTryRunData.builder()
@@ -31,7 +32,7 @@ public class ChallengeAcceptanceController {
     }
 
     @PostMapping("run")
-    public ChallengeAcceptanceDto tryRun(@PathVariable String id, @RequestBody RunRequest runRequest) {
+    public Mono<ChallengeAcceptanceDto> tryRun(@PathVariable String id, @RequestBody RunRequest runRequest) {
         // TODO: implement username properly once security would be enabled
         return challengeAcceptanceService.runChallenge(
                 ChallengeRunData.builder()

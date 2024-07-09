@@ -1,15 +1,17 @@
 package net.burndmg.eschallenges.repository;
 
+import reactor.core.publisher.Mono;
+
 import java.util.List;
 import java.util.Map;
 
 public interface ChallengeRunRepository {
 
-    void tryCreateIndex(String indexName, Map<String, Object> indexSettings);
+    Mono<Boolean> createIndex(String indexName, Map<String, Object> indexSettings);
 
-    void tryDeleteIndex(String indexName);
+    Mono<Boolean> deleteIndex(String indexName);
 
-    void saveAll(String indexName, List<Map<String, Object>> indexedData);
+    Mono<Void> saveAll(String indexName, List<Map<String, Object>> indexedData);
 
-    List<Map<String, Object>> search(String indexName, String searchRequest);
+    Mono<List<Map<String, Object>>> search(String indexName, String searchRequest);
 }
