@@ -5,7 +5,6 @@ import net.burndmg.eschallenges.data.model.Challenge;
 import net.burndmg.eschallenges.integration.util.IntegrationTestBase;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.util.List;
 import java.util.Map;
@@ -95,8 +94,8 @@ public class ChallengeAcceptanceControllerIntegrationTest extends IntegrationTes
     @Test
     void tryRun_whenSentWrongRequest_shouldFail() {
         List<Map<String, Object>> indexedData = List.of(
-                Map.of("name", "Dmitry"),
-                Map.of("name", "Maria")
+                Map.of("name", "Andrijana"),
+                Map.of("name", "Nikola")
         );
         TryRunRequest tryRunRequest = new TryRunRequest(indexedData, """
                                                                             {
@@ -106,7 +105,7 @@ public class ChallengeAcceptanceControllerIntegrationTest extends IntegrationTes
                                                                                     {
                                                                                       "terms": {
                                                                                         "name.keyword": [
-                                                                                          "Maria",
+                                                                                          "Nikola",
                                                                                           "Not existing name"
                                                                                         ]
                                                                                       }
@@ -118,13 +117,13 @@ public class ChallengeAcceptanceControllerIntegrationTest extends IntegrationTes
                                                                             """);
 
         Challenge challenge = testIndexer.indexChallenge(Challenge.builder()
-                                                                  .title("Find Dmitry!")
+                                                                  .title("Find Andrijana!")
                                                                   .idealRequest("""
                                                                                   {
                                                                                       "query": {
                                                                                         "term": {
                                                                                           "name.keyword": {
-                                                                                            "value": "Dmitry"
+                                                                                            "value": "Andrijana"
                                                                                           }
                                                                                         }
                                                                                       }
@@ -163,12 +162,7 @@ public class ChallengeAcceptanceControllerIntegrationTest extends IntegrationTes
                                                                   .build());
 
 
-        webTestClient
-                .post()
-                .uri("/challenges/" + challenge.id() + "/acceptances/try-run")
-                .bodyValue(tryRunRequest)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
+        post("/challenges/" + challenge.id() + "/acceptances/try-run", tryRunRequest)
                 .expectStatus().isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }

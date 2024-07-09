@@ -43,9 +43,10 @@ public class ChallengeRunner {
         try {
             challengeRunRepository.tryCreateIndex(indexName, indexSettings);
         } catch (UncategorizedElasticsearchException e) {
-            if (e.getMessage().equals("resource_already_exists_exception")) {
+            if (e.getMessage().contains("resource_already_exists_exception")) {
                 throw new ConcurrentChallengeRunException("You can't run more than one challenge simultaneously.");
             }
+            throw e;
         }
 
     }
