@@ -18,7 +18,7 @@ public class ParticipantChallengesController {
 
     private final ParticipantChallengesService challengesService;
 
-    @GetMapping("{id}")
+    @GetMapping("{id}/run")
     public Mono<ParticipantChallenge> challengeById(@PathVariable String id) {
         return challengesService.getChallengeById(id);
     }

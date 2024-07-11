@@ -104,7 +104,7 @@ public class ParticipantChallengesControllerIntegrationTest extends IntegrationT
     void challengeById_whenIdExists_shouldReturnChallenge() {
         Challenge challenge = testIndexer.indexRandomChallengeAndReturnIt("1");
 
-        getSuccessful("/challenges/1")
+        getSuccessful("/challenges/1/run")
                 .jsonPath("$.id").isEqualTo(challenge.id())
                 .jsonPath("$.title").isEqualTo(challenge.title())
                 .jsonPath("$.description").isEqualTo(challenge.description());
@@ -116,7 +116,7 @@ public class ParticipantChallengesControllerIntegrationTest extends IntegrationT
 
         webTestClient
                 .get()
-                .uri("/challenges/2")
+                .uri("/challenges/2/run")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isEqualTo(404);

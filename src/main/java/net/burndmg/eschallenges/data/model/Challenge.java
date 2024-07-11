@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Singular;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.List;
 import java.util.Map;
@@ -19,13 +21,16 @@ public record Challenge (
 
         String description,
 
+        @Field(type = FieldType.Object)
         Map<String, Object> indexSettings,
 
         String idealRequest,
 
         @Singular
+        @Field(type = FieldType.Object)
         List<ChallengeTest> challengeTests,
 
+        @Field(type = FieldType.Object)
         List<ChallengeExample> examples,
 
         String timestamp
