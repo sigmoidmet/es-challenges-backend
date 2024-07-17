@@ -4,15 +4,12 @@ import lombok.SneakyThrows;
 import net.burndmg.eschallenges.data.dto.run.RunRequest;
 import net.burndmg.eschallenges.data.dto.tryrun.TryRunRequest;
 import net.burndmg.eschallenges.data.model.Challenge;
-import net.burndmg.eschallenges.data.model.ChallengeTest;
 import net.burndmg.eschallenges.integration.util.IntegrationTestBase;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -35,11 +32,13 @@ public class ChallengeAcceptanceConcurrencyIntegrationTest extends IntegrationTe
                      }
                  }
                 """;
-        List<Map<String, Object>> indexedData = List.of(
-                Map.of("name", "Nikola"),
-                Map.of("name", "Andrijana")
-        );
-        TryRunRequest tryRunRequest = new TryRunRequest(indexedData, request);
+        String jsonIndexedDataArray = """
+                                      [
+                                          { "name": "Nikola" },
+                                          { "name": "Andrijana" }
+                                      ]
+                                      """;
+        TryRunRequest tryRunRequest = new TryRunRequest(jsonIndexedDataArray, request);
 
         Challenge challenge = testIndexer.indexChallenge(Challenge.builder()
                                                                   .title("Find Nikola!")
@@ -85,14 +84,20 @@ public class ChallengeAcceptanceConcurrencyIntegrationTest extends IntegrationTe
         Challenge challenge = testIndexer.indexChallenge(Challenge.builder()
                                                                   .title("Find Nikola!")
                                                                   .idealRequest(request)
-                                                                  .challengeTest(new ChallengeTest(List.of(
-                                                                          Map.of("name", "Minh"),
-                                                                          Map.of("name", "Khai")
-                                                                  )))
-                                                                  .challengeTest(new ChallengeTest(List.of(
-                                                                          Map.of("name", "Nikola"),
-                                                                          Map.of("name", "Andrijana")
-                                                                 )))
+                                                                  .jsonChallengeTestArray(
+                                                                          """
+                                                                            [
+                                                                                { "name": "Minh" },
+                                                                                { "name": "Khai" }
+                                                                            ]
+                                                                          """)
+                                                                 .jsonChallengeTestArray(
+                                                                            """ 
+                                                                            [
+                                                                                { "name": "Nikola" },
+                                                                                { "name": "Andrijana" }
+                                                                            ]
+                                                                            """)
                                                                   .build());
 
 

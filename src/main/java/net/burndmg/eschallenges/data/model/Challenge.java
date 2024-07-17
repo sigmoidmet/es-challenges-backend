@@ -8,7 +8,6 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.List;
-import java.util.Map;
 
 @Document(indexName = Challenge.INDEX_NAME, createIndex = false)
 @Builder
@@ -21,14 +20,12 @@ public record Challenge (
 
         String description,
 
-        @Field(type = FieldType.Object)
-        Map<String, Object> indexSettings,
+        String jsonIndexSettings,
 
         String idealRequest,
 
         @Singular
-        @Field(type = FieldType.Object)
-        List<ChallengeTest> challengeTests,
+        List<String> jsonChallengeTestArrays,
 
         @Field(type = FieldType.Object)
         List<ChallengeExample> examples,

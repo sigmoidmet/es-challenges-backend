@@ -9,7 +9,7 @@ import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.repository.ReactiveElasticsearchRepository;
 import reactor.core.publisher.Mono;
 
-public interface ChallengeRepository extends ReactiveElasticsearchRepository<Challenge, String>, PaginationRepository, ProjectionRepository {
+public interface ChallengeRepository extends ReactiveElasticsearchRepository<Challenge, String>, PaginationRepository<Challenge>, ProjectionRepository {
 
     IndexCoordinates INDEX = IndexCoordinates.of(Challenge.INDEX_NAME);
 

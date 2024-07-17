@@ -1,5 +1,6 @@
 package net.burndmg.eschallenges.core.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.RequiredArgsConstructor;
 import net.burndmg.eschallenges.core.ChallengeRunner;
 import net.burndmg.eschallenges.data.dto.run.*;
@@ -9,11 +10,15 @@ import net.burndmg.eschallenges.data.dto.tryrun.TryRunResponse;
 import net.burndmg.eschallenges.data.model.ChallengeAcceptance;
 import net.burndmg.eschallenges.data.model.ChallengeAcceptanceFailedTest;
 import net.burndmg.eschallenges.infrastructure.expection.instance.NotFoundException;
+import net.burndmg.eschallenges.infrastructure.util.ObjectMapperWrapper;
 import net.burndmg.eschallenges.map.ChallengeAcceptanceMapper;
 import net.burndmg.eschallenges.repository.ChallengeAcceptanceRepository;
 import net.burndmg.eschallenges.repository.ChallengeRepository;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +28,7 @@ public class ChallengeAcceptanceService {
     private final ChallengeAcceptanceRepository challengeAcceptanceRepository;
     private final ChallengeRunner challengeRunner;
     private final ChallengeAcceptanceMapper challengeAcceptanceMapper;
+    private final ObjectMapperWrapper objectMapper;
 
     public Mono<TryRunResponse> tryRunChallenge(ChallengeTryRunData challengeTryRunData) {
         return getChallengeById(challengeTryRunData.challengeId(), ChallengeForTryRun.class)
@@ -30,7 +36,7 @@ public class ChallengeAcceptanceService {
                         ChallengeRunConfiguration.builder()
                                                  .indexName(challengeTryRunData.username())
                                                  .indexSettings(challenge.indexSettings())
-                                                 .indexedData(challengeTryRunData.indexedData())
+                                                 .indexedData(toJson(challengeTryRunData.jsonIndexedDataArray()))
                                                  .idealRequest(challenge.idealRequest())
                                                  .userRequest(challengeTryRunData.request())
                                                  .build()
@@ -44,19 +50,19 @@ public class ChallengeAcceptanceService {
 
     public Mono<ChallengeAcceptanceDto> runChallenge(ChallengeRunData runData) {
         return getChallengeById(runData.challengeId(), ChallengeForRun.class)
-                .flatMapIterable(challenge -> challenge.challengeTests()
+                .flatMapIterable(challenge -> challenge.jsonChallengeTestArrays()
                                                        .stream()
                                                        .map(test -> RunTest.builder()
-                                                               .idealRequest(challenge.idealRequest())
-                                                               .indexSettings(challenge.indexSettings())
-                                                               .test(test)
+                                                                           .idealRequest(challenge.idealRequest())
+                                                                           .indexSettings(challenge.indexSettings())
+                                                                           .jsonTestArray(test)
                                                                            .build())
                                                        .toList())
                 .concatMap(runTest -> challengeRunner.run(
                         ChallengeRunConfiguration.builder()
                                                  .indexName(runData.username())
                                                  .indexSettings(runTest.indexSettings())
-                                                 .indexedData(runTest.test().dataJson())
+                                                 .indexedData(toJson(runTest.jsonTestArray()))
                                                  .idealRequest(runTest.idealRequest())
                                                  .userRequest(runData.request())
                                                  .build()
@@ -64,6 +70,10 @@ public class ChallengeAcceptanceService {
                 .takeWhile(this::isSuccessful)
                 .last()
                 .flatMap(runResult -> saveAcceptance(runData, runResult));
+    }
+
+    private List<Map<String, Object>> toJson(String jsonDataArray) {
+        return objectMapper.readValue(jsonDataArray, new TypeReference<>() {});
     }
 
     private Mono<ChallengeAcceptanceDto> saveAcceptance(ChallengeRunData runData, ChallengeRunResult runResult) {

@@ -2,12 +2,8 @@ package net.burndmg.eschallenges.integration;
 
 import net.burndmg.eschallenges.data.dto.run.RunRequest;
 import net.burndmg.eschallenges.data.model.Challenge;
-import net.burndmg.eschallenges.data.model.ChallengeTest;
 import net.burndmg.eschallenges.integration.util.IntegrationTestBase;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
 
 public class ChallengeAcceptanceRunIntegrationTest extends IntegrationTestBase {
 
@@ -24,37 +20,54 @@ public class ChallengeAcceptanceRunIntegrationTest extends IntegrationTestBase {
                               }
                           }
                          """;
-        String expectedName = "Dmitry";
         RunRequest runRequest = new RunRequest(request);
 
         Challenge challenge = testIndexer.indexChallenge(Challenge.builder()
                                                                   .title("Find Dmitry!")
-                                                                  .challengeTest(new ChallengeTest(List.of(
-                                                                          Map.of("name", expectedName),
-                                                                          Map.of("name", "Maria")
-                                                                  )))
-                                                                  .challengeTest(new ChallengeTest(List.of(
-                                                                          Map.of("name", "Alyona"),
-                                                                          Map.of("name", "Anna"),
-                                                                          Map.of("name", "Maria"),
-                                                                          Map.of("name", "Tatyana"),
-                                                                          Map.of("name", expectedName),
-                                                                          Map.of("name", "Maria")
-                                                                  )))
-                                                                  .challengeTest(new ChallengeTest(List.of(
-                                                                          Map.of("name", "Alexander"),
-                                                                          Map.of("name", "Anna"),
-                                                                          Map.of("name", "Maria"),
-                                                                          Map.of("name", expectedName),
-                                                                          Map.of("name", "Maria")
-                                                                  )))
-                                                                  .challengeTest(new ChallengeTest(List.of(
-                                                                          Map.of("name", "Andrijana"),
-                                                                          Map.of("name", "Milos"),
-                                                                          Map.of("name", "Nikola"),
-                                                                          Map.of("name", "Mina"),
-                                                                          Map.of("name", "Petar")
-                                                                  )))
+                                                                  .jsonChallengeTestArray("""
+                                                                                            [
+                                                                                                { "name": "Dmitry" },
+                                                                                                { "name": "Maria" }
+                                                                                            ]
+                                                                                          """)
+                                                                  .jsonChallengeTestArray("""
+                                                                                            [
+                                                                                                { "name": "Alyona" },
+                                                                                                { "name": "Anna" },
+                                                                                                { "name": "Maria" },
+                                                                                                { "name": "Tatyana" },
+                                                                                                { "name": "Dmitry" },
+                                                                                                { "name": "Maria" }
+                                                                                            ]
+                                                                                          """)
+                                                                  .jsonChallengeTestArray("""
+                                                                                            [
+                                                                                                { "name": "Alyona" },
+                                                                                                { "name": "Anna" },
+                                                                                                { "name": "Maria" },
+                                                                                                { "name": "Tatyana" },
+                                                                                                { "name": "Dmitry" },
+                                                                                                { "name": "Maria" }
+                                                                                            ]
+                                                                                          """)
+                                                                  .jsonChallengeTestArray("""
+                                                                                            [
+                                                                                                { "name": "Alexander" },
+                                                                                                { "name": "Anna" },
+                                                                                                { "name": "Maria" },
+                                                                                                { "name": "Dmitry" },
+                                                                                                { "name": "Maria" }
+                                                                                            ]
+                                                                                          """)
+                                                                  .jsonChallengeTestArray("""
+                                                                                            [
+                                                                                                { "name": "Andrijana" },
+                                                                                                { "name": "Milos" },
+                                                                                                { "name": "Nikola" },
+                                                                                                { "name": "Mina" },
+                                                                                                { "name": "Petar" }
+                                                                                            ]
+                                                                                          """)
                                                                   .idealRequest(request)
                                                                   .build());
 
@@ -91,28 +104,32 @@ public class ChallengeAcceptanceRunIntegrationTest extends IntegrationTestBase {
 
         Challenge challenge = testIndexer.indexChallenge(Challenge.builder()
                                                                   .title("Find Dmitry!")
-                                                                  .challengeTest(new ChallengeTest(List.of(
-                                                                          Map.of("name", "Dmitry"),
-                                                                          Map.of("name", "Maria")
-                                                                  )))
-                                                                  .challengeTest(new ChallengeTest(List.of(
-                                                                          Map.of("name", "Andrijana"),
-                                                                          Map.of("name", "Milos"),
-                                                                          Map.of("name", "Nikola"),
-                                                                          Map.of("name", "Mina"),
-                                                                          Map.of("name", "Petar")
-                                                                  )))
+                                                                  .jsonChallengeTestArray("""
+                                                                                            [
+                                                                                                { "name": "Dmitry" },
+                                                                                                { "name": "Maria" }
+                                                                                            ]
+                                                                                          """)
+                                                                  .jsonChallengeTestArray("""
+                                                                                            [
+                                                                                                { "name": "Andrijana" },
+                                                                                                { "name": "Milos" },
+                                                                                                { "name": "Nikola" },
+                                                                                                { "name": "Mina" },
+                                                                                                { "name": "Petar" }
+                                                                                            ]
+                                                                                          """)
                                                                   .idealRequest("""
-                                                                  {
-                                                                      "query": {
-                                                                        "term": {
-                                                                          "name.keyword": {
-                                                                            "value": "Maria"
-                                                                          }
-                                                                        }
-                                                                      }
-                                                                  }
-                                                                 """)
+                                                                                 {
+                                                                                     "query": {
+                                                                                       "term": {
+                                                                                         "name.keyword": {
+                                                                                           "value": "Maria"
+                                                                                         }
+                                                                                       }
+                                                                                     }
+                                                                                 }
+                                                                                """)
                                                                   .build());
 
 
@@ -159,18 +176,30 @@ public class ChallengeAcceptanceRunIntegrationTest extends IntegrationTestBase {
                                                                                       }
                                                                                   }
                                                                                  """)
-                                                                 .challengeTest(new ChallengeTest(List.of(
-                                                                         Map.of("name", "Andrijana",
-                                                                                "position", "intern"),
-                                                                         Map.of("name", "Nikola",
-                                                                                "position", "intern"),
-                                                                         Map.of("name", "Dmitry",
-                                                                                "position", "T3")
-                                                                 )))
-                                                                  .challengeTest(new ChallengeTest(List.of(
-                                                                          Map.of("name", "Dmitry",
-                                                                                 "position", "T3")
-                                                                  )))
+                                                                  .jsonChallengeTestArray("""
+                                                                                            [
+                                                                                                {
+                                                                                                    "name": "Andrijana",
+                                                                                                    "position": "intern"
+                                                                                                },
+                                                                                                {
+                                                                                                    "name": "Nikola",
+                                                                                                    "position": "intern"
+                                                                                                },
+                                                                                                {
+                                                                                                    "name": "Dmitry",
+                                                                                                    "position": "T3"
+                                                                                                }
+                                                                                            ]
+                                                                                          """)
+                                                                  .jsonChallengeTestArray("""
+                                                                                            [
+                                                                                                {
+                                                                                                    "name": "Dmitry",
+                                                                                                    "position": "T3"
+                                                                                                }
+                                                                                            ]
+                                                                                          """)
                                                                   .build());
 
 

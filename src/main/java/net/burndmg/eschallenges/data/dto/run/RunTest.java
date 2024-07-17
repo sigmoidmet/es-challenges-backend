@@ -1,7 +1,6 @@
 package net.burndmg.eschallenges.data.dto.run;
 
 import lombok.Builder;
-import net.burndmg.eschallenges.data.model.ChallengeTest;
 
 import java.util.Map;
 
@@ -9,5 +8,5 @@ import java.util.Map;
 public record RunTest(
         Map<String, Object> indexSettings,
         String idealRequest,
-        ChallengeTest test
+        String jsonTestArray
 ) {}

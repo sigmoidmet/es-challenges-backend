@@ -3,6 +3,7 @@ package net.burndmg.eschallenges.repository.common;
 import lombok.RequiredArgsConstructor;
 import net.burndmg.eschallenges.data.dto.Page;
 import net.burndmg.eschallenges.data.dto.PageSettings;
+import net.burndmg.eschallenges.data.model.TimestampBasedSortable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.core.ReactiveElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ReactiveSearchHits;
@@ -20,7 +21,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 
 
 @RequiredArgsConstructor
-public class PaginationRepositoryImpl implements PaginationRepository {
+public class PaginationRepositoryImpl<ENTITY extends TimestampBasedSortable> implements PaginationRepository<ENTITY> {
 
     private final ReactiveElasticsearchOperations elasticsearchOperations;
 

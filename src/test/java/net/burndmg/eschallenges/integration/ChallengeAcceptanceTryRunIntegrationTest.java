@@ -6,9 +6,6 @@ import net.burndmg.eschallenges.integration.util.IntegrationTestBase;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-import java.util.List;
-import java.util.Map;
-
 public class ChallengeAcceptanceTryRunIntegrationTest extends IntegrationTestBase {
 
     @Test
@@ -25,11 +22,13 @@ public class ChallengeAcceptanceTryRunIntegrationTest extends IntegrationTestBas
                           }
                          """;
         String expectedName = "Dmitry";
-        List<Map<String, Object>> indexedData = List.of(
-                Map.of("name", expectedName),
-                Map.of("name", "Maria")
-        );
-        TryRunRequest tryRunRequest = new TryRunRequest(indexedData, request);
+        String jsonIndexedDataArray = """
+                                      [
+                                          { "name": "Dmitry" },
+                                          { "name": "Maria" }
+                                      ]
+                                      """;
+        TryRunRequest tryRunRequest = new TryRunRequest(jsonIndexedDataArray, request);
 
         Challenge challenge = testIndexer.indexChallenge(Challenge.builder()
                                                                   .title("Find Dmitry!")
@@ -46,28 +45,30 @@ public class ChallengeAcceptanceTryRunIntegrationTest extends IntegrationTestBas
     @Test
     void tryRun_whenSentIdenticalRequest_shouldSucceed() {
         String expectedName = "Maria";
-        List<Map<String, Object>> indexedData = List.of(
-                Map.of("name", "Dmitry"),
-                Map.of("name", expectedName)
-        );
-        TryRunRequest tryRunRequest = new TryRunRequest(indexedData, """
-                                                                            {
-                                                                              "query": {
-                                                                                "bool": {
-                                                                                  "filter": [
-                                                                                    {
-                                                                                      "terms": {
-                                                                                        "name.keyword": [
-                                                                                          "Maria",
-                                                                                          "Not existing name"
-                                                                                        ]
+        String jsonIndexedDataArray = """
+                                      [
+                                          { "name": "Dmitry" },
+                                          { "name": "Maria" }
+                                      ]
+                                      """;
+        TryRunRequest tryRunRequest = new TryRunRequest(jsonIndexedDataArray, """
+                                                                              {
+                                                                                "query": {
+                                                                                  "bool": {
+                                                                                    "filter": [
+                                                                                      {
+                                                                                        "terms": {
+                                                                                          "name.keyword": [
+                                                                                            "Maria",
+                                                                                            "Not existing name"
+                                                                                          ]
+                                                                                        }
                                                                                       }
-                                                                                    }
-                                                                                  ]
+                                                                                    ]
+                                                                                  }
                                                                                 }
                                                                               }
-                                                                            }
-                                                                            """);
+                                                                              """);
 
         Challenge challenge = testIndexer.indexChallenge(Challenge.builder()
                                                                   .title("Find Maria!")
@@ -93,28 +94,30 @@ public class ChallengeAcceptanceTryRunIntegrationTest extends IntegrationTestBas
 
     @Test
     void tryRun_whenSentWrongRequest_shouldFail() {
-        List<Map<String, Object>> indexedData = List.of(
-                Map.of("name", "Andrijana"),
-                Map.of("name", "Nikola")
-        );
-        TryRunRequest tryRunRequest = new TryRunRequest(indexedData, """
-                                                                            {
-                                                                              "query": {
-                                                                                "bool": {
-                                                                                  "filter": [
-                                                                                    {
-                                                                                      "terms": {
-                                                                                        "name.keyword": [
-                                                                                          "Nikola",
-                                                                                          "Not existing name"
-                                                                                        ]
+        String jsonIndexedDataArray = """
+                                      [
+                                          { "name": "Andrijana" },
+                                          { "name": "Nikola" }
+                                      ]
+                                      """;
+        TryRunRequest tryRunRequest = new TryRunRequest(jsonIndexedDataArray, """
+                                                                              {
+                                                                                "query": {
+                                                                                  "bool": {
+                                                                                    "filter": [
+                                                                                      {
+                                                                                        "terms": {
+                                                                                          "name.keyword": [
+                                                                                            "Nikola",
+                                                                                            "Not existing name"
+                                                                                          ]
+                                                                                        }
                                                                                       }
-                                                                                    }
-                                                                                  ]
+                                                                                    ]
+                                                                                  }
                                                                                 }
                                                                               }
-                                                                            }
-                                                                            """);
+                                                                              """);
 
         Challenge challenge = testIndexer.indexChallenge(Challenge.builder()
                                                                   .title("Find Andrijana!")
@@ -140,11 +143,13 @@ public class ChallengeAcceptanceTryRunIntegrationTest extends IntegrationTestBas
 
     @Test
     void tryRun_whenSentInvalidRequest_shouldFail() {
-        List<Map<String, Object>> indexedData = List.of(
-                Map.of("name", "Nikola"),
-                Map.of("name", "Andrijana")
-        );
-        TryRunRequest tryRunRequest = new TryRunRequest(indexedData, "{ DELETE * FROM Transactions;");
+        String jsonIndexedDataArray = """
+                                      [
+                                          { "name": "Nikola" },
+                                          { "name": "Andrijana" }
+                                      ]
+                                      """;
+        TryRunRequest tryRunRequest = new TryRunRequest(jsonIndexedDataArray, "{ DELETE * FROM Transactions;");
 
         Challenge challenge = testIndexer.indexChallenge(Challenge.builder()
                                                                   .title("Find Nikola!")

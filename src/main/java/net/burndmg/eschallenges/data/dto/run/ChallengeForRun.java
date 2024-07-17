@@ -1,6 +1,5 @@
 package net.burndmg.eschallenges.data.dto.run;
 
-import net.burndmg.eschallenges.data.model.ChallengeTest;
 
 import java.util.List;
 import java.util.Map;
@@ -11,5 +10,5 @@ public record ChallengeForRun (
 
         String idealRequest,
 
-        List<ChallengeTest> challengeTests
+        List<String> jsonChallengeTestArrays
 ) {}

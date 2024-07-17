@@ -24,7 +24,7 @@ public class ChallengeAcceptanceController {
         return challengeAcceptanceService.tryRunChallenge(
                 ChallengeTryRunData.builder()
                                    .challengeId(id)
-                                   .indexedData(tryRunRequest.indexedData())
+                                   .jsonIndexedDataArray(tryRunRequest.jsonIndexedDataArray())
                                    .request(tryRunRequest.request())
                                    .username("temporal_placeholder")
                                    .build()

@@ -3,7 +3,7 @@ Content-Type: application/json
 
 {
   "index_patterns": [
-    "challenges_*"
+    "challenges*"
   ],
   "priority": 1,
   "template": {
@@ -31,17 +31,16 @@ Content-Type: application/json
           "norms": false
         },
         "indexSettings": {
-          "type": "object"
+          "type": "keyword",
+          "index_options": "docs",
+          "index": false,
+          "norms": false
         },
         "challengeTests": {
-          "type": "object",
-          "dynamic": false,
-          "properties": {
-            "dataJson": {
-              "type": "object",
-              "dynamic": true
-            }
-          }
+          "type": "keyword",
+          "index_options": "docs",
+          "index": false,
+          "norms": false
         },
         "examples": {
           "type": "object",

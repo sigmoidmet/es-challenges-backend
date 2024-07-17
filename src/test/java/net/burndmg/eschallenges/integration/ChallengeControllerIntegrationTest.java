@@ -7,9 +7,6 @@ import net.burndmg.eschallenges.integration.util.IntegrationTestBase;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
-import java.util.Map;
-
-import static net.burndmg.eschallenges.integration.util.TestUtil.challengeTest;
 
 public class ChallengeControllerIntegrationTest extends IntegrationTestBase {
 
@@ -19,11 +16,11 @@ public class ChallengeControllerIntegrationTest extends IntegrationTestBase {
         ChallengeDto challenge = ChallengeDto.builder()
                                              .title("Dream challenge")
                                              .description("You've never dreamt of it actually")
-                                             .challengeTest(challengeTest(Map.of("dream", "NIGHTMARE!!!")))
+                                             .jsonChallengeTestArray("\"dream\": \"NIGHTMARE!!\"")
                                              .example(new ChallengeExample("dream = nightmare",
                                                                            "yes",
                                                                            "it's a dream"))
-                                             .indexSettings(Map.of("set", "get"))
+                                             .jsonIndexSettings("\"set\":\"get\"")
                                              .idealRequest("just return yes, haha")
                                              .build();
 
@@ -31,16 +28,12 @@ public class ChallengeControllerIntegrationTest extends IntegrationTestBase {
 
         getSuccessful("/challenges/" + savedId)
                 .jsonPath("$.title").isEqualTo(challenge.title())
-                .jsonPath("$.challengeTests[0].dataJson[0]['dream']").isEqualTo(challenge.challengeTests()
-                                                                                                   .get(0)
-                                                                                                   .dataJson()
-                                                                                                   .get(0)
-                                                                                                   .get("dream"))
+                .jsonPath("$.jsonChallengeTestArrays[0]").isEqualTo(challenge.jsonChallengeTestArrays().get(0))
                 .jsonPath("$.idealRequest").isEqualTo(challenge.idealRequest())
                 .jsonPath("$.examples[0].testDataJson").isEqualTo(challenge.examples().get(0).testDataJson())
                 .jsonPath("$.examples[0].expectedResult").isEqualTo(challenge.examples().get(0).expectedResult())
                 .jsonPath("$.examples[0].explanation").isEqualTo(challenge.examples().get(0).explanation())
-                .jsonPath("$.indexSettings['set']").isEqualTo("get")
+                .jsonPath("$.jsonIndexSettings").isEqualTo(challenge.jsonIndexSettings())
                 .jsonPath("$.description").isEqualTo(challenge.description());
     }
 
@@ -50,10 +43,10 @@ public class ChallengeControllerIntegrationTest extends IntegrationTestBase {
 
         getSuccessful("/challenges/1")
                 .jsonPath("$.title").isEqualTo(challenge.title())
-                .jsonPath("$.challengeTests").exists()
+                .jsonPath("$.jsonChallengeTestArrays").exists()
                 .jsonPath("$.idealRequest").isEqualTo(challenge.idealRequest())
                 .jsonPath("$.examples").exists()
-                .jsonPath("$.indexSettings").exists()
+                .jsonPath("$.jsonIndexSettings").exists()
                 .jsonPath("$.description").isEqualTo(challenge.description());
     }
 

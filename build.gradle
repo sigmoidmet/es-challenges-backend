@@ -49,7 +49,7 @@ dependencies {
     )
 }
 
-test {
+tasks.withType(Test).configureEach {
     useJUnitPlatform()
     systemProperty "useLocalElasticsearch", System.getProperty("useLocalElasticsearch")
 }
