@@ -5,13 +5,17 @@ import net.burndmg.eschallenges.data.model.Challenge;
 import net.burndmg.eschallenges.data.model.ChallengeExample;
 import net.burndmg.eschallenges.integration.util.IntegrationTestBase;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.test.context.support.WithMockUser;
+
+import static net.burndmg.eschallenges.infrastructure.config.security.SecurityAuthority.CHALLENGE_CREATION_PRIVILEGE;
 
 
-public class ChallengeControllerIntegrationTest extends IntegrationTestBase {
+public class ChallengeCreationIntegrationTest extends IntegrationTestBase {
 
 
     @Test
+    @WithMockUser(authorities = CHALLENGE_CREATION_PRIVILEGE)
     void saveChallenge() {
         ChallengeDto challenge = ChallengeDto.builder()
                                              .title("Dream challenge")
@@ -38,6 +42,24 @@ public class ChallengeControllerIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
+    @WithMockUser(authorities = "I don't have any")
+    void save_whenUserWithoutPrivilege_shouldForbid() {
+        ChallengeDto challenge = ChallengeDto.builder()
+                                             .title("I will create my own challenge, haha!")
+                                             .description("They think, it's secure")
+                                             .jsonChallengeTestArray("\"but\": \"it's not!!\"")
+                                             .example(new ChallengeExample("I am a hacker!",
+                                                                           "haha",
+                                                                           "haha haha"))
+                                             .jsonIndexSettings("\"will\":\"control\"")
+                                             .idealRequest("everything on this service!")
+                                             .build();
+
+        post("/challenges", challenge).expectStatus().isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    @WithMockUser(authorities = CHALLENGE_CREATION_PRIVILEGE)
     void challengeById_whenIdExists_shouldReturnChallenge() {
         Challenge challenge = testIndexer.indexRandomChallengeAndReturnIt("1");
 
@@ -51,14 +73,18 @@ public class ChallengeControllerIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
+    @WithMockUser(authorities = "I don't have any")
+    void challengeById_whenUserWithoutPrivilege_shouldForbid() {
+        testIndexer.indexRandomChallengeAndReturnIt("1");
+
+        get("/challenges/1").expectStatus().isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    @WithMockUser(authorities = CHALLENGE_CREATION_PRIVILEGE)
     void challengeById_whenIdNotExists_shouldReturn404() {
         testIndexer.indexRandomChallengeAndReturnIt("1");
 
-        webTestClient
-                .get()
-                .uri("/challenges/2")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isEqualTo(404);
+        get("/challenges/2").expectStatus().isEqualTo(404);
     }
 }

@@ -3,13 +3,17 @@ package net.burndmg.eschallenges.controller;
 import lombok.RequiredArgsConstructor;
 import net.burndmg.eschallenges.core.service.ChallengeService;
 import net.burndmg.eschallenges.data.dto.ChallengeDto;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import static net.burndmg.eschallenges.infrastructure.config.security.SecurityAuthority.CHALLENGE_CREATION_PRIVILEGE;
 
 @RestController
 @RequestMapping("challenges")
 @RequiredArgsConstructor
-public class ChallengeController {
+@PreAuthorize("hasAuthority('" + CHALLENGE_CREATION_PRIVILEGE +"')")
+public class ChallengeCreationController {
 
     private final ChallengeService challengeService;
 

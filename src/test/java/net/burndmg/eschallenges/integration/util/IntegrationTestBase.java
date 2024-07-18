@@ -7,6 +7,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
+
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(classes = IntegrationTestConfiguration.class)
 public abstract class IntegrationTestBase implements ElasticsearchAware {
@@ -24,11 +27,7 @@ public abstract class IntegrationTestBase implements ElasticsearchAware {
 
 
     protected <T> T getSuccessful(String path, Class<T> type) {
-        return webTestClient
-                .get()
-                .uri(path)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
+        return get(path)
                 .expectStatus().is2xxSuccessful()
                 .expectBody(type)
                 .returnResult()
@@ -36,13 +35,17 @@ public abstract class IntegrationTestBase implements ElasticsearchAware {
     }
 
     protected WebTestClient.BodyContentSpec getSuccessful(String path) {
+        return get(path)
+                .expectStatus().is2xxSuccessful()
+                .expectBody();
+    }
+
+    protected WebTestClient.ResponseSpec get(String path) {
         return webTestClient
                 .get()
                 .uri(path)
                 .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().is2xxSuccessful()
-                .expectBody();
+                .exchange();
     }
 
     protected <T> T postSuccessful(String path, Object body, Class<T> responseClass) {
@@ -61,8 +64,10 @@ public abstract class IntegrationTestBase implements ElasticsearchAware {
 
     protected WebTestClient.ResponseSpec post(String path, Object body) {
         return webTestClient
+                .mutateWith(csrf())
                 .post()
                 .uri(path)
+//                .header("Authorization", "Basic dXNlcjp1c2Vy")
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(body)
                 .exchange();

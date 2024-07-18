@@ -1,11 +1,13 @@
-package net.burndmg.eschallenges.integration;
+package net.burndmg.eschallenges.integration.acceptance;
 
 import net.burndmg.eschallenges.data.dto.tryrun.TryRunRequest;
 import net.burndmg.eschallenges.data.model.Challenge;
 import net.burndmg.eschallenges.integration.util.IntegrationTestBase;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.test.context.support.WithMockUser;
 
+@WithMockUser
 public class ChallengeAcceptanceTryRunIntegrationTest extends IntegrationTestBase {
 
     @Test

@@ -24,6 +24,7 @@ dependencies {
     implementation(
             platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"),
             "org.springframework.boot:spring-boot-starter",
+            "org.springframework.boot:spring-boot-starter-security",
             "org.springframework.boot:spring-boot-starter-webflux",
             "org.springframework.boot:spring-boot-starter-data-elasticsearch",
             "com.senacor.elasticsearch.evolution:spring-boot-starter-elasticsearch-evolution:$elasticEvolutionVersion",
@@ -43,7 +44,7 @@ dependencies {
             platform("org.junit:junit-bom:$junitVersion"),
             "org.junit.jupiter:junit-jupiter",
             "org.springframework.boot:spring-boot-starter-test",
-            "org.springframework.boot:spring-boot-starter-webflux",
+            "org.springframework.security:spring-security-test",
             "org.testcontainers:testcontainers:$testcontainersVersion",
             "org.testcontainers:elasticsearch:$testcontainersVersion",
     )

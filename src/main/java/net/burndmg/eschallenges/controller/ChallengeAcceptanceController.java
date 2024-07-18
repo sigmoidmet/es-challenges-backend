@@ -8,6 +8,8 @@ import net.burndmg.eschallenges.data.dto.run.RunRequest;
 import net.burndmg.eschallenges.data.dto.tryrun.ChallengeTryRunData;
 import net.burndmg.eschallenges.data.dto.tryrun.TryRunRequest;
 import net.burndmg.eschallenges.data.dto.tryrun.TryRunResponse;
+import net.burndmg.eschallenges.infrastructure.annotation.AuthUsername;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -19,26 +21,30 @@ public class ChallengeAcceptanceController {
     private final ChallengeAcceptanceService challengeAcceptanceService;
 
     @PostMapping("try-run")
-    public Mono<TryRunResponse> tryRun(@PathVariable String id, @RequestBody TryRunRequest tryRunRequest) {
-        // TODO: implement username properly once security would be enabled
+    @PreAuthorize("isAuthenticated()")
+    public Mono<TryRunResponse> tryRun(@PathVariable String id,
+                                       @RequestBody TryRunRequest tryRunRequest,
+                                       @AuthUsername String username) {
         return challengeAcceptanceService.tryRunChallenge(
                 ChallengeTryRunData.builder()
                                    .challengeId(id)
                                    .jsonIndexedDataArray(tryRunRequest.jsonIndexedDataArray())
                                    .request(tryRunRequest.request())
-                                   .username("temporal_placeholder")
+                                   .username(username)
                                    .build()
         );
     }
 
     @PostMapping("run")
-    public Mono<ChallengeAcceptanceDto> tryRun(@PathVariable String id, @RequestBody RunRequest runRequest) {
-        // TODO: implement username properly once security would be enabled
+    @PreAuthorize("isAuthenticated()")
+    public Mono<ChallengeAcceptanceDto> run(@PathVariable String id,
+                                            @RequestBody RunRequest runRequest,
+                                            @AuthUsername String username) {
         return challengeAcceptanceService.runChallenge(
                 ChallengeRunData.builder()
                                 .challengeId(id)
                                 .request(runRequest.request())
-                                .username("temporal_placeholder")
+                                .username(username)
                                 .build()
         );
     }

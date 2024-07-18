@@ -1,10 +1,12 @@
-package net.burndmg.eschallenges.integration;
+package net.burndmg.eschallenges.integration.acceptance;
 
 import net.burndmg.eschallenges.data.dto.run.RunRequest;
 import net.burndmg.eschallenges.data.model.Challenge;
 import net.burndmg.eschallenges.integration.util.IntegrationTestBase;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.test.context.support.WithMockUser;
 
+@WithMockUser(username = "user")
 public class ChallengeAcceptanceRunIntegrationTest extends IntegrationTestBase {
 
     @Test
@@ -74,7 +76,7 @@ public class ChallengeAcceptanceRunIntegrationTest extends IntegrationTestBase {
 
         postSuccessful("/challenges/" + challenge.id() + "/acceptances/run", runRequest)
                 .jsonPath("$.id").exists()
-                .jsonPath("$.username").isEqualTo("temporal_placeholder")
+                .jsonPath("$.username").isEqualTo("user")
                 .jsonPath("$.challengeId").isEqualTo(challenge.id())
                 .jsonPath("$.request").isEqualTo(request)
                 .jsonPath("$.successful").isEqualTo(true)
@@ -135,7 +137,7 @@ public class ChallengeAcceptanceRunIntegrationTest extends IntegrationTestBase {
 
         postSuccessful("/challenges/" + challenge.id() + "/acceptances/run", runRequest)
                 .jsonPath("$.id").exists()
-                .jsonPath("$.username").isEqualTo("temporal_placeholder")
+                .jsonPath("$.username").isEqualTo("user")
                 .jsonPath("$.challengeId").isEqualTo(challenge.id())
                 .jsonPath("$.request").isEqualTo(runRequest.request())
                 .jsonPath("$.successful").isEqualTo(true)
@@ -205,7 +207,7 @@ public class ChallengeAcceptanceRunIntegrationTest extends IntegrationTestBase {
 
         postSuccessful("/challenges/" + challenge.id() + "/acceptances/run", runRequest)
                 .jsonPath("$.id").exists()
-                .jsonPath("$.username").isEqualTo("temporal_placeholder")
+                .jsonPath("$.username").isEqualTo("user")
                 .jsonPath("$.challengeId").isEqualTo(challenge.id())
                 .jsonPath("$.request").isEqualTo(runRequest.request())
                 .jsonPath("$.successful").isEqualTo(true)

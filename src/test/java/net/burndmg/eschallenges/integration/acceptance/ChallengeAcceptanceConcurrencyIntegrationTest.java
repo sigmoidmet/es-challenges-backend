@@ -1,4 +1,4 @@
-package net.burndmg.eschallenges.integration;
+package net.burndmg.eschallenges.integration.acceptance;
 
 import lombok.SneakyThrows;
 import net.burndmg.eschallenges.data.dto.run.RunRequest;
@@ -7,6 +7,7 @@ import net.burndmg.eschallenges.data.model.Challenge;
 import net.burndmg.eschallenges.integration.util.IntegrationTestBase;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.HashSet;
@@ -19,6 +20,7 @@ public class ChallengeAcceptanceConcurrencyIntegrationTest extends IntegrationTe
 
     // TODO: can flicker potentially, for now it hasn't happened but if it will we may use some RetryingTest to minimize flickering
     @Test
+    @WithMockUser
     @SneakyThrows
     void tryRun_whenTwoSimultaneousRequestsByTheSameUser_shouldFailOne() {
         String request = """
@@ -66,6 +68,7 @@ public class ChallengeAcceptanceConcurrencyIntegrationTest extends IntegrationTe
 
     // TODO: can flicker potentially, for now it hasn't happened but if it will we may use some RetryingTest to minimize flickering
     @Test
+    @WithMockUser
     @SneakyThrows
     void run_whenTwoSimultaneousRequestsByTheSameUser_shouldFailOne() {
         String request = """

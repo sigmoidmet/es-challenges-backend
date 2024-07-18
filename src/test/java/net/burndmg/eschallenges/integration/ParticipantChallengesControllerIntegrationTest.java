@@ -114,11 +114,6 @@ public class ParticipantChallengesControllerIntegrationTest extends IntegrationT
     void challengeById_whenIdNotExists_shouldReturn404() {
         testIndexer.indexRandomChallengeAndReturnIt("1");
 
-        webTestClient
-                .get()
-                .uri("/challenges/2/run")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isEqualTo(404);
+        get("/challenges/2/run").expectStatus().isEqualTo(404);
     }
 }

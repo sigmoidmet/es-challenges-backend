@@ -2,7 +2,9 @@ package net.burndmg.eschallenges.infrastructure.expection;
 
 import lombok.extern.slf4j.Slf4j;
 import net.burndmg.eschallenges.infrastructure.expection.instance.ApiException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,6 +21,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleArgumentNotValidException(MethodArgumentNotValidException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<String> handleAccessDeniedException(AccessDeniedException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
