@@ -14,6 +14,7 @@ import net.burndmg.eschallenges.infrastructure.util.ObjectMapperWrapper;
 import net.burndmg.eschallenges.map.ChallengeAcceptanceMapper;
 import net.burndmg.eschallenges.repository.ChallengeAcceptanceRepository;
 import net.burndmg.eschallenges.repository.ChallengeRepository;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -104,6 +105,6 @@ public class ChallengeAcceptanceService {
     }
     
     private boolean isSuccessful(ChallengeRunResult runResult) {
-        return runResult.expectedResult().equals(runResult.actualResult());
+        return CollectionUtils.isEqualCollection(runResult.expectedResult(), runResult.actualResult());
     }
 }
