@@ -1,0 +1,19 @@
+  POST _aliases
+  Content-Type: application/json
+
+  {
+    "actions": [
+      {
+        "add": {
+          "index": "challenges-v4",
+          "alias": "challenges-read"
+        }
+      },
+      {
+        "remove": {
+          "index": "*",
+          "alias": "challenges-read"
+        }
+      }
+    ]
+  }

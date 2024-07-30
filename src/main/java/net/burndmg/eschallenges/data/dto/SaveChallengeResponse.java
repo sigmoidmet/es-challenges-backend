@@ -1,5 +1,5 @@
 package net.burndmg.eschallenges.data.dto;
 
-public record CreateChallengeResponse (
+public record SaveChallengeResponse(
         String id
 ) {}

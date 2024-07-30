@@ -1,7 +1,7 @@
 package net.burndmg.eschallenges.integration;
 
 import net.burndmg.eschallenges.data.dto.ChallengeDto;
-import net.burndmg.eschallenges.data.dto.CreateChallengeResponse;
+import net.burndmg.eschallenges.data.dto.SaveChallengeResponse;
 import net.burndmg.eschallenges.data.model.Challenge;
 import net.burndmg.eschallenges.data.model.ChallengeExample;
 import net.burndmg.eschallenges.integration.util.IntegrationTestBase;
@@ -29,7 +29,7 @@ public class ChallengeManagementIntegrationTest extends IntegrationTestBase {
                                              .idealRequest("just return yes, haha")
                                              .build();
 
-        var savedId = postSuccessful("/challenges", challenge, CreateChallengeResponse.class);
+        var savedId = postSuccessful("/challenges", challenge, SaveChallengeResponse.class);
 
         getSuccessful("/challenges/" + savedId.id())
                 .jsonPath("$.title").isEqualTo(challenge.title())
@@ -57,8 +57,7 @@ public class ChallengeManagementIntegrationTest extends IntegrationTestBase {
                                              .build();
 
         putSuccessful("/challenges/" + indexedChallenge.id(), updateChallenge)
-                .jsonPath("$.id").isEqualTo(indexedChallenge.id())
-                .jsonPath("$.isDuringReindexingProcess").isEqualTo(false);
+                .jsonPath("$.id").isEqualTo(indexedChallenge.id());
 
         getSuccessful("/challenges/" + indexedChallenge.id())
                 .jsonPath("$.title").isEqualTo(updateChallenge.title())
@@ -73,7 +72,7 @@ public class ChallengeManagementIntegrationTest extends IntegrationTestBase {
 
     @Test
     @WithMockUser(authorities = CHALLENGE_CREATION_PRIVILEGE)
-    void updateChallenge_whenAnotherUpdateAlias_shouldUpdateToAnotherIndex() {
+    void updateChallenge_whenAnotherUpdateAlias_shouldUpdateToBoth() {
         Challenge indexedChallenge = testIndexer.indexRandomChallengeAndReturnIt("test");
 
         ChallengeDto updateChallenge = ChallengeDto.builder()
@@ -88,8 +87,7 @@ public class ChallengeManagementIntegrationTest extends IntegrationTestBase {
         testIndexer.switchUpdateAliasTo("another-index");
 
         putSuccessful("/challenges/" + indexedChallenge.id(), updateChallenge)
-                .jsonPath("$.id").isEqualTo(indexedChallenge.id())
-                .jsonPath("$.isDuringReindexingProcess").isEqualTo(true);
+                .jsonPath("$.id").isEqualTo(indexedChallenge.id());
     }
 
     @Test

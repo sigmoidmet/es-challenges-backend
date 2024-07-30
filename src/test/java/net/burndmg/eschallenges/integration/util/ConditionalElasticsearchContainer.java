@@ -9,6 +9,12 @@ public class ConditionalElasticsearchContainer extends ElasticsearchContainer {
 
     public ConditionalElasticsearchContainer() {
         super("elasticsearch:8.14.1");
+
+        withEnv("xpack.security.enabled", "false");
+        withEnv("xpack.security.enrollment.enabled", "false");
+        withEnv("xpack.security.http.ssl.enabled", "false");
+        withEnv("xpack.security.transport.ssl.enabled", "false");
+
         start();
     }
 
@@ -27,7 +33,7 @@ public class ConditionalElasticsearchContainer extends ElasticsearchContainer {
             return "http://localhost:9200";
         }
 
-        return super.getHttpHostAddress();
+        return "http://" + super.getHttpHostAddress();
     }
 
     private boolean shouldUseLocallyRunningElasticsearch() {

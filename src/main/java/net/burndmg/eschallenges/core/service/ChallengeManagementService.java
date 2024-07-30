@@ -2,7 +2,7 @@ package net.burndmg.eschallenges.core.service;
 
 import lombok.RequiredArgsConstructor;
 import net.burndmg.eschallenges.data.dto.ChallengeDto;
-import net.burndmg.eschallenges.data.dto.CreateChallengeResponse;
+import net.burndmg.eschallenges.data.dto.SaveChallengeResponse;
 import net.burndmg.eschallenges.data.dto.UpdateChallengeResponse;
 import net.burndmg.eschallenges.data.model.Challenge;
 import net.burndmg.eschallenges.infrastructure.expection.instance.NotFoundException;
@@ -18,21 +18,23 @@ public class ChallengeManagementService {
     private final ChallengeRepository challengeRepository;
     private final ChallengeMapper challengeMapper;
 
-    public Mono<CreateChallengeResponse> create(ChallengeDto challenge) {
+    public Mono<SaveChallengeResponse> create(ChallengeDto challenge) {
         Challenge model = challengeMapper.toModel(challenge);
 
+        return save(model);
+    }
+
+    public Mono<SaveChallengeResponse> update(String id, ChallengeDto challenge) {
+        Challenge model = challengeMapper.toModel(id, challenge);
+
+        return save(model);
+    }
+
+    private Mono<SaveChallengeResponse> save(Challenge model) {
         return challengeRepository.saveToReadIndex(model)
                                   .flatMap(challengeRepository::saveToUpdateIndex)
                                   .map(Challenge::id)
-                                  .map(CreateChallengeResponse::new);
-    }
-
-    public Mono<UpdateChallengeResponse> update(String id, ChallengeDto challenge) {
-        Challenge model = challengeMapper.toModel(id, challenge);
-
-        return challengeRepository
-                .saveToUpdateIndex(model)
-                .flatMap(this::toUpdateResponse);
+                                  .map(SaveChallengeResponse::new);
     }
 
     private Mono<UpdateChallengeResponse> toUpdateResponse(Challenge updatedChallenge) {

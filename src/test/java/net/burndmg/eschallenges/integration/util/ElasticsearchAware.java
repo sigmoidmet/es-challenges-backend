@@ -9,6 +9,7 @@ public interface ElasticsearchAware {
 
     @DynamicPropertySource
     static void setDynamicProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.elasticsearch.cluster-nodes", conditionalElasticsearchContainer::getHost);
+        registry.add("spring.data.elasticsearch.cluster-nodes", conditionalElasticsearchContainer::getHttpHostAddress);
+        registry.add("spring.elasticsearch.uris", conditionalElasticsearchContainer::getHttpHostAddress);
     }
 }
