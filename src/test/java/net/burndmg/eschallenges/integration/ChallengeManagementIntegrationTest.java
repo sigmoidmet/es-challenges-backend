@@ -1,6 +1,7 @@
 package net.burndmg.eschallenges.integration;
 
 import net.burndmg.eschallenges.data.dto.ChallengeDto;
+import net.burndmg.eschallenges.data.dto.CreateChallengeResponse;
 import net.burndmg.eschallenges.data.model.Challenge;
 import net.burndmg.eschallenges.data.model.ChallengeExample;
 import net.burndmg.eschallenges.integration.util.IntegrationTestBase;
@@ -11,12 +12,12 @@ import org.springframework.security.test.context.support.WithMockUser;
 import static net.burndmg.eschallenges.infrastructure.config.security.SecurityAuthority.CHALLENGE_CREATION_PRIVILEGE;
 
 
-public class ChallengeCreationIntegrationTest extends IntegrationTestBase {
+public class ChallengeManagementIntegrationTest extends IntegrationTestBase {
 
 
     @Test
     @WithMockUser(authorities = CHALLENGE_CREATION_PRIVILEGE)
-    void saveChallenge() {
+    void createChallenge() {
         ChallengeDto challenge = ChallengeDto.builder()
                                              .title("Dream challenge")
                                              .description("You've never dreamt of it actually")
@@ -28,9 +29,9 @@ public class ChallengeCreationIntegrationTest extends IntegrationTestBase {
                                              .idealRequest("just return yes, haha")
                                              .build();
 
-        String savedId = postSuccessful("/challenges", challenge, String.class);
+        var savedId = postSuccessful("/challenges", challenge, CreateChallengeResponse.class);
 
-        getSuccessful("/challenges/" + savedId)
+        getSuccessful("/challenges/" + savedId.id())
                 .jsonPath("$.title").isEqualTo(challenge.title())
                 .jsonPath("$.jsonChallengeTestArrays[0]").isEqualTo(challenge.jsonChallengeTestArrays().get(0))
                 .jsonPath("$.idealRequest").isEqualTo(challenge.idealRequest())
@@ -39,6 +40,56 @@ public class ChallengeCreationIntegrationTest extends IntegrationTestBase {
                 .jsonPath("$.examples[0].explanation").isEqualTo(challenge.examples().get(0).explanation())
                 .jsonPath("$.jsonIndexSettings").isEqualTo(challenge.jsonIndexSettings())
                 .jsonPath("$.description").isEqualTo(challenge.description());
+    }
+
+    @Test
+    @WithMockUser(authorities = CHALLENGE_CREATION_PRIVILEGE)
+    void updateChallenge() {
+        Challenge indexedChallenge = testIndexer.indexRandomChallengeAndReturnIt("test");
+
+        ChallengeDto updateChallenge = ChallengeDto.builder()
+                                             .title("Some another title")
+                                             .description(indexedChallenge.description())
+                                             .jsonChallengeTestArrays(indexedChallenge.jsonChallengeTestArrays())
+                                             .examples(indexedChallenge.examples())
+                                             .jsonIndexSettings(indexedChallenge.jsonIndexSettings())
+                                             .idealRequest("some another request")
+                                             .build();
+
+        putSuccessful("/challenges/" + indexedChallenge.id(), updateChallenge)
+                .jsonPath("$.id").isEqualTo(indexedChallenge.id())
+                .jsonPath("$.isDuringReindexingProcess").isEqualTo(false);
+
+        getSuccessful("/challenges/" + indexedChallenge.id())
+                .jsonPath("$.title").isEqualTo(updateChallenge.title())
+                .jsonPath("$.jsonChallengeTestArrays[0]").isEqualTo(updateChallenge.jsonChallengeTestArrays().get(0))
+                .jsonPath("$.idealRequest").isEqualTo(updateChallenge.idealRequest())
+                .jsonPath("$.examples[0].testDataJson").isEqualTo(updateChallenge.examples().get(0).testDataJson())
+                .jsonPath("$.examples[0].expectedResult").isEqualTo(updateChallenge.examples().get(0).expectedResult())
+                .jsonPath("$.examples[0].explanation").isEqualTo(updateChallenge.examples().get(0).explanation())
+                .jsonPath("$.jsonIndexSettings").isEqualTo(updateChallenge.jsonIndexSettings())
+                .jsonPath("$.description").isEqualTo(updateChallenge.description());
+    }
+
+    @Test
+    @WithMockUser(authorities = CHALLENGE_CREATION_PRIVILEGE)
+    void updateChallenge_whenAnotherUpdateAlias_shouldUpdateToAnotherIndex() {
+        Challenge indexedChallenge = testIndexer.indexRandomChallengeAndReturnIt("test");
+
+        ChallengeDto updateChallenge = ChallengeDto.builder()
+                                                   .title("Some another title")
+                                                   .description(indexedChallenge.description())
+                                                   .jsonChallengeTestArrays(indexedChallenge.jsonChallengeTestArrays())
+                                                   .examples(indexedChallenge.examples())
+                                                   .jsonIndexSettings(indexedChallenge.jsonIndexSettings())
+                                                   .idealRequest("some another request")
+                                                   .build();
+
+        testIndexer.switchUpdateAliasTo("another-index");
+
+        putSuccessful("/challenges/" + indexedChallenge.id(), updateChallenge)
+                .jsonPath("$.id").isEqualTo(indexedChallenge.id())
+                .jsonPath("$.isDuringReindexingProcess").isEqualTo(true);
     }
 
     @Test

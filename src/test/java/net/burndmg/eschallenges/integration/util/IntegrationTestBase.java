@@ -67,7 +67,30 @@ public abstract class IntegrationTestBase implements ElasticsearchAware {
                 .mutateWith(csrf())
                 .post()
                 .uri(path)
-//                .header("Authorization", "Basic dXNlcjp1c2Vy")
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(body)
+                .exchange();
+    }
+
+    protected WebTestClient.BodyContentSpec putSuccessful(String path, Object body) {
+        return put(path, body)
+                .expectStatus().is2xxSuccessful()
+                .expectBody();
+    }
+
+    protected <T> T putSuccessful(String path, Object body, Class<T> responseClass) {
+        return put(path, body)
+                .expectStatus().is2xxSuccessful()
+                .expectBody(responseClass)
+                .returnResult()
+                .getResponseBody();
+    }
+
+    protected WebTestClient.ResponseSpec put(String path, Object body) {
+        return webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(path)
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(body)
                 .exchange();

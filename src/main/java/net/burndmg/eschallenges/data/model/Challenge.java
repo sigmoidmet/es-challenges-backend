@@ -9,7 +9,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.List;
 
-@Document(indexName = Challenge.INDEX_NAME, createIndex = false)
+@Document(indexName = Challenge.READ_INDEX_NAME, createIndex = false)
 @Builder
 public record Challenge (
 
@@ -30,8 +30,11 @@ public record Challenge (
         @Field(type = FieldType.Object)
         List<ChallengeExample> examples,
 
+        boolean expectsTheSameOrder,
+
         String timestamp
 ) implements TimestampBasedSortable {
 
-        public static final String INDEX_NAME = "challenges";
+        public static final String READ_INDEX_NAME = "challenges-read";
+        public static final String UPDATE_INDEX_NAME = "challenges-update";
 }
