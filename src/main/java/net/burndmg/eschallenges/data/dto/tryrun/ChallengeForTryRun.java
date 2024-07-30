@@ -4,5 +4,6 @@ import java.util.Map;
 
 public record ChallengeForTryRun (
         Map<String, Object> indexSettings,
-        String idealRequest
+        String idealRequest,
+        boolean ordered
 ) {}

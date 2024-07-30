@@ -33,20 +33,20 @@ public class ChallengeAcceptanceService {
 
     public Mono<TryRunResponse> tryRunChallenge(ChallengeTryRunData challengeTryRunData) {
         return getChallengeById(challengeTryRunData.challengeId(), ChallengeForTryRun.class)
-                .flatMap(challenge -> challengeRunner.run(
-                        ChallengeRunConfiguration.builder()
-                                                 .indexName(challengeTryRunData.username())
-                                                 .indexSettings(challenge.indexSettings())
-                                                 .indexedData(toJson(challengeTryRunData.jsonIndexedDataArray()))
-                                                 .idealRequest(challenge.idealRequest())
-                                                 .userRequest(challengeTryRunData.request())
-                                                 .build()
-                ))
-                .map(runResult -> TryRunResponse.builder()
-                                                .actualResponse(runResult.actualResult())
-                                                .expectedResponse(runResult.expectedResult())
-                                                .isSuccessful(isSuccessful(runResult))
-                                                .build());
+                .map(challenge -> RunTest.builder()
+                                         .username(challengeTryRunData.username())
+                                         .indexSettings(challenge.indexSettings())
+                                         .idealRequest(challenge.idealRequest())
+                                         .jsonTestArray(challengeTryRunData.jsonIndexedDataArray())
+                                         .userRequest(challengeTryRunData.request())
+                                         .resultShouldBeOrdered(challenge.ordered())
+                                         .build())
+                .flatMap(this::run)
+                .map(runResultHolder -> TryRunResponse.builder()
+                                                      .actualResponse(runResultHolder.result().actualResult())
+                                                      .expectedResponse(runResultHolder.result().expectedResult())
+                                                      .isSuccessful(runResultHolder.isSuccessful())
+                                                      .build());
     }
 
     public Mono<ChallengeAcceptanceDto> runChallenge(ChallengeRunData runData) {
@@ -54,57 +54,83 @@ public class ChallengeAcceptanceService {
                 .flatMapIterable(challenge -> challenge.jsonChallengeTestArrays()
                                                        .stream()
                                                        .map(test -> RunTest.builder()
-                                                                           .idealRequest(challenge.idealRequest())
+                                                                           .username(runData.username())
                                                                            .indexSettings(challenge.indexSettings())
+                                                                           .idealRequest(challenge.idealRequest())
                                                                            .jsonTestArray(test)
+                                                                           .userRequest(runData.request())
+                                                                           .resultShouldBeOrdered(challenge.ordered())
                                                                            .build())
                                                        .toList())
-                .concatMap(runTest -> challengeRunner.run(
-                        ChallengeRunConfiguration.builder()
-                                                 .indexName(runData.username())
-                                                 .indexSettings(runTest.indexSettings())
-                                                 .indexedData(toJson(runTest.jsonTestArray()))
-                                                 .idealRequest(runTest.idealRequest())
-                                                 .userRequest(runData.request())
-                                                 .build()
-                ))
-                .takeWhile(this::isSuccessful)
-                .last()
-                .flatMap(runResult -> saveAcceptance(runData, runResult));
-    }
-
-    private List<Map<String, Object>> toJson(String jsonDataArray) {
-        return objectMapper.readValue(jsonDataArray, new TypeReference<>() {});
-    }
-
-    private Mono<ChallengeAcceptanceDto> saveAcceptance(ChallengeRunData runData, ChallengeRunResult runResult) {
-        boolean successful = isSuccessful(runResult);
-        var failedTest = successful ?
-                null :
-                ChallengeAcceptanceFailedTest.builder()
-                                             .testDataJson(runResult.indexedDataJson())
-                                             .actualOutput(runResult.actualResult())
-                                             .expectedOutput(runResult.expectedResult())
-                                             .build();
-
-        return challengeAcceptanceRepository.save(
-                ChallengeAcceptance
-                        .builder()
-                        .challengeId(runData.challengeId())
-                        .request(runData.request())
-                        .failedTest(failedTest)
-                        .username(runData.username())
-                        .successful(successful)
-                        .build()
-        ).map(challengeAcceptanceMapper::toDto);
+                .concatMap(this::run)
+                .collectList()
+                .flatMap(runResults -> getFirstFailedOrAny(runData, runResults));
     }
 
     private <T> Mono<T> getChallengeById(String id, Class<T> type) {
         return challengeRepository.findById(id, type)
                                   .switchIfEmpty(Mono.error(new NotFoundException("There is no challenge by id " + id)));
     }
+
+    private Mono<ChallengeRunResultHolder> run(RunTest runTest) {
+        return challengeRunner.run(
+                ChallengeRunConfiguration.builder()
+                                         .indexName(runTest.username())
+                                         .indexSettings(runTest.indexSettings())
+                                         .indexedData(toJson(runTest.jsonTestArray()))
+                                         .idealRequest(runTest.idealRequest())
+                                         .userRequest(runTest.userRequest())
+                                         .build()
+        ).map(result -> ChallengeRunResultHolder.builder()
+                                                .result(result)
+                                                .isSuccessful(isSuccessful(result, runTest.resultShouldBeOrdered()))
+                                                .build());
+    }
+
+    private List<Map<String, Object>> toJson(String jsonDataArray) {
+        return objectMapper.readValue(jsonDataArray, new TypeReference<>() {});
+    }
     
-    private boolean isSuccessful(ChallengeRunResult runResult) {
-        return CollectionUtils.isEqualCollection(runResult.expectedResult(), runResult.actualResult());
+    private boolean isSuccessful(ChallengeRunResult runResult, boolean resultShouldBeOrdered) {
+        if (!resultShouldBeOrdered) {
+            return CollectionUtils.isEqualCollection(runResult.expectedResult(), runResult.actualResult());
+        } else {
+            return runResult.expectedResult().equals(runResult.actualResult());
+        }
+    }
+
+    private Mono<ChallengeAcceptanceDto> getFirstFailedOrAny(ChallengeRunData runData, List<ChallengeRunResultHolder> runResults) {
+        return runResults.stream()
+                         .filter(ruNResult -> !ruNResult.isSuccessful())
+                         .findFirst()
+                         .map(failedRunResult -> saveFailedAcceptance(runData, failedRunResult.result()))
+                         .orElse(saveSuccessfulAcceptance(runData));
+    }
+
+    private Mono<ChallengeAcceptanceDto> saveFailedAcceptance(ChallengeRunData runData,
+                                                              ChallengeRunResult failedRunResult) {
+        var failedTest = ChallengeAcceptanceFailedTest.builder()
+                                                      .testDataJson(failedRunResult.indexedDataJson())
+                                                      .actualOutput(failedRunResult.actualResult())
+                                                      .expectedOutput(failedRunResult.expectedResult())
+                                                      .build();
+
+        return challengeAcceptanceRepository
+                .save(acceptanceOf(runData).successful(false).failedTest(failedTest).build())
+                .map(challengeAcceptanceMapper::toDto);
+    }
+
+    private Mono<ChallengeAcceptanceDto> saveSuccessfulAcceptance(ChallengeRunData runData) {
+        return challengeAcceptanceRepository
+                .save(acceptanceOf(runData).successful(true).build())
+                .map(challengeAcceptanceMapper::toDto);
+    }
+
+
+    private ChallengeAcceptance.ChallengeAcceptanceBuilder acceptanceOf(ChallengeRunData runData) {
+        return ChallengeAcceptance.builder()
+                                  .challengeId(runData.challengeId())
+                                  .request(runData.request())
+                                  .username(runData.username());
     }
 }

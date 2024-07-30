@@ -154,8 +154,7 @@ public class ChallengeAcceptanceRunIntegrationTest extends IntegrationTestBase {
                                                         {
                                                           "terms": {
                                                             "position.keyword": [
-                                                              "intern",
-                                                              "Not existing type like T1000"
+                                                              "T3"
                                                             ]
                                                           }
                                                         }
@@ -210,7 +209,21 @@ public class ChallengeAcceptanceRunIntegrationTest extends IntegrationTestBase {
                 .jsonPath("$.username").isEqualTo("user")
                 .jsonPath("$.challengeId").isEqualTo(challenge.id())
                 .jsonPath("$.request").isEqualTo(runRequest.request())
-                .jsonPath("$.successful").isEqualTo(true)
-                .jsonPath("$.failedTest").doesNotExist();
+                .jsonPath("$.successful").isEqualTo(false)
+
+                .jsonPath("$.failedTest.testDataJson[0]['name']").isEqualTo("Andrijana")
+                .jsonPath("$.failedTest.testDataJson[0]['position']").isEqualTo("intern")
+                .jsonPath("$.failedTest.testDataJson[1]['name']").isEqualTo("Nikola")
+                .jsonPath("$.failedTest.testDataJson[1]['position']").isEqualTo("intern")
+                .jsonPath("$.failedTest.testDataJson[2]['name']").isEqualTo("Dmitry")
+                .jsonPath("$.failedTest.testDataJson[2]['position']").isEqualTo("T3")
+
+                .jsonPath("$.failedTest.expectedOutput[0]['name']").isEqualTo("Andrijana")
+                .jsonPath("$.failedTest.expectedOutput[0]['position']").isEqualTo("intern")
+                .jsonPath("$.failedTest.expectedOutput[1]['name']").isEqualTo("Nikola")
+                .jsonPath("$.failedTest.expectedOutput[1]['position']").isEqualTo("intern")
+
+                .jsonPath("$.failedTest.actualOutput[0]['name']").isEqualTo("Dmitry")
+                .jsonPath("$.failedTest.actualOutput[0]['position']").isEqualTo("T3");
     }
 }

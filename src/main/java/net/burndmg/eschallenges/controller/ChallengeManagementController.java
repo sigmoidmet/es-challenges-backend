@@ -8,12 +8,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import static net.burndmg.eschallenges.infrastructure.config.security.SecurityAuthority.CHALLENGE_CREATION_PRIVILEGE;
+import static net.burndmg.eschallenges.infrastructure.config.security.SecurityAuthority.CHALLENGE_MANAGEMENT_PRIVILEGE;
 
 @RestController
-@RequestMapping("challenges")
 @RequiredArgsConstructor
-@PreAuthorize("hasAuthority('" + CHALLENGE_CREATION_PRIVILEGE +"')")
+@RequestMapping("challenges")
+@PreAuthorize("hasAuthority('" + CHALLENGE_MANAGEMENT_PRIVILEGE + "')")
 public class ChallengeManagementController {
 
     private final ChallengeManagementService challengeManagementService;

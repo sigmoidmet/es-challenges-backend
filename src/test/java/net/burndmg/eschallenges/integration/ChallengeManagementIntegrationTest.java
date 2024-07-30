@@ -9,14 +9,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import static net.burndmg.eschallenges.infrastructure.config.security.SecurityAuthority.CHALLENGE_CREATION_PRIVILEGE;
+import static net.burndmg.eschallenges.infrastructure.config.security.SecurityAuthority.CHALLENGE_MANAGEMENT_PRIVILEGE;
 
 
 public class ChallengeManagementIntegrationTest extends IntegrationTestBase {
 
 
     @Test
-    @WithMockUser(authorities = CHALLENGE_CREATION_PRIVILEGE)
+    @WithMockUser(authorities = CHALLENGE_MANAGEMENT_PRIVILEGE)
     void createChallenge() {
         ChallengeDto challenge = ChallengeDto.builder()
                                              .title("Dream challenge")
@@ -43,7 +43,7 @@ public class ChallengeManagementIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    @WithMockUser(authorities = CHALLENGE_CREATION_PRIVILEGE)
+    @WithMockUser(authorities = CHALLENGE_MANAGEMENT_PRIVILEGE)
     void updateChallenge() {
         Challenge indexedChallenge = testIndexer.indexRandomChallengeAndReturnIt("test");
 
@@ -53,7 +53,7 @@ public class ChallengeManagementIntegrationTest extends IntegrationTestBase {
                                              .jsonChallengeTestArrays(indexedChallenge.jsonChallengeTestArrays())
                                              .examples(indexedChallenge.examples())
                                              .jsonIndexSettings(indexedChallenge.jsonIndexSettings())
-                                             .idealRequest("some another request")
+                                             .idealRequest("some another userRequest")
                                              .build();
 
         putSuccessful("/challenges/" + indexedChallenge.id(), updateChallenge)
@@ -71,7 +71,7 @@ public class ChallengeManagementIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    @WithMockUser(authorities = CHALLENGE_CREATION_PRIVILEGE)
+    @WithMockUser(authorities = CHALLENGE_MANAGEMENT_PRIVILEGE)
     void updateChallenge_whenAnotherUpdateAlias_shouldUpdateToBoth() {
         Challenge indexedChallenge = testIndexer.indexRandomChallengeAndReturnIt("test");
 
@@ -81,7 +81,7 @@ public class ChallengeManagementIntegrationTest extends IntegrationTestBase {
                                                    .jsonChallengeTestArrays(indexedChallenge.jsonChallengeTestArrays())
                                                    .examples(indexedChallenge.examples())
                                                    .jsonIndexSettings(indexedChallenge.jsonIndexSettings())
-                                                   .idealRequest("some another request")
+                                                   .idealRequest("some another userRequest")
                                                    .build();
 
         testIndexer.switchUpdateAliasTo("another-index");
@@ -108,7 +108,7 @@ public class ChallengeManagementIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    @WithMockUser(authorities = CHALLENGE_CREATION_PRIVILEGE)
+    @WithMockUser(authorities = CHALLENGE_MANAGEMENT_PRIVILEGE)
     void challengeById_whenIdExists_shouldReturnChallenge() {
         Challenge challenge = testIndexer.indexRandomChallengeAndReturnIt("1");
 
@@ -130,7 +130,7 @@ public class ChallengeManagementIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    @WithMockUser(authorities = CHALLENGE_CREATION_PRIVILEGE)
+    @WithMockUser(authorities = CHALLENGE_MANAGEMENT_PRIVILEGE)
     void challengeById_whenIdNotExists_shouldReturn404() {
         testIndexer.indexRandomChallengeAndReturnIt("1");
 

@@ -16,6 +16,7 @@ import org.springframework.data.elasticsearch.core.RefreshPolicy;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 @TestComponent
@@ -66,16 +67,7 @@ public class TestIndexer {
     }
 
     public Challenge indexRandomChallengeAndReturnIt(String id) {
-        Challenge challenge = Challenge.builder()
-                                       .id(id)
-                                       .title(UUID.randomUUID().toString())
-                                       .description(UUID.randomUUID().toString())
-                                       .jsonChallengeTestArray(UUID.randomUUID().toString())
-                                       .jsonChallengeTestArray(UUID.randomUUID().toString())
-                                       .idealRequest(UUID.randomUUID().toString())
-                                       .jsonIndexSettings(UUID.randomUUID().toString())
-                                       .examples(List.of(new ChallengeExample(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString())))
-                                       .build();
+        Challenge challenge = randomChallenge(id).build();
 
         challenge = indexChallenge(challenge);
 
@@ -84,5 +76,20 @@ public class TestIndexer {
 
     public Challenge indexChallenge(Challenge challenge) {
         return challengeRepository.save(challenge, RefreshPolicy.IMMEDIATE);
+    }
+
+    public Challenge.ChallengeBuilder randomChallenge(String id) {
+        return Challenge.builder()
+                         .id(id)
+                         .title(UUID.randomUUID().toString())
+                         .description(UUID.randomUUID().toString())
+                         .jsonChallengeTestArray(UUID.randomUUID().toString())
+                         .jsonChallengeTestArray(UUID.randomUUID().toString())
+                         .idealRequest(UUID.randomUUID().toString())
+                         .jsonIndexSettings(UUID.randomUUID().toString())
+                         .ordered(ThreadLocalRandom.current().nextBoolean())
+                         .examples(List.of(new ChallengeExample(UUID.randomUUID().toString(),
+                                                                UUID.randomUUID().toString(),
+                                                                UUID.randomUUID().toString())));
     }
 }

@@ -24,6 +24,8 @@ public record Challenge (
 
         String idealRequest,
 
+        boolean ordered,
+
         @Singular
         List<String> jsonChallengeTestArrays,
 

@@ -7,8 +7,7 @@ import java.util.Map;
 public record ChallengeForRun (
 
         Map<String, Object> indexSettings,
-
         String idealRequest,
-
-        List<String> jsonChallengeTestArrays
+        List<String> jsonChallengeTestArrays,
+        boolean ordered
 ) {}

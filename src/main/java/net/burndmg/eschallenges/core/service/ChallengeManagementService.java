@@ -3,7 +3,6 @@ package net.burndmg.eschallenges.core.service;
 import lombok.RequiredArgsConstructor;
 import net.burndmg.eschallenges.data.dto.ChallengeDto;
 import net.burndmg.eschallenges.data.dto.SaveChallengeResponse;
-import net.burndmg.eschallenges.data.dto.UpdateChallengeResponse;
 import net.burndmg.eschallenges.data.model.Challenge;
 import net.burndmg.eschallenges.infrastructure.expection.instance.NotFoundException;
 import net.burndmg.eschallenges.map.ChallengeMapper;
@@ -35,11 +34,6 @@ public class ChallengeManagementService {
                                   .flatMap(challengeRepository::saveToUpdateIndex)
                                   .map(Challenge::id)
                                   .map(SaveChallengeResponse::new);
-    }
-
-    private Mono<UpdateChallengeResponse> toUpdateResponse(Challenge updatedChallenge) {
-        return challengeRepository.isReadAndUpdateAliasesPointToDifferentIndices()
-                                  .map(result -> new UpdateChallengeResponse(updatedChallenge.id(), result));
     }
 
     public Mono<ChallengeDto> findById(String id) {
