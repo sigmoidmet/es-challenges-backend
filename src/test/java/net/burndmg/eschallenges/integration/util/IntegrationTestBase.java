@@ -7,8 +7,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
-
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(classes = IntegrationTestConfiguration.class)
@@ -64,7 +62,6 @@ public abstract class IntegrationTestBase implements ElasticsearchAware {
 
     protected WebTestClient.ResponseSpec post(String path, Object body) {
         return webTestClient
-                .mutateWith(csrf())
                 .post()
                 .uri(path)
                 .accept(MediaType.APPLICATION_JSON)
@@ -88,7 +85,6 @@ public abstract class IntegrationTestBase implements ElasticsearchAware {
 
     protected WebTestClient.ResponseSpec put(String path, Object body) {
         return webTestClient
-                .mutateWith(csrf())
                 .put()
                 .uri(path)
                 .accept(MediaType.APPLICATION_JSON)

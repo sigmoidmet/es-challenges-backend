@@ -5,6 +5,7 @@ import net.burndmg.eschallenges.infrastructure.expection.instance.ApiException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.ErrorResponseException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,6 +16,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<String> handleApiException(ApiException e) {
+        return ResponseEntity.status(e.getStatusCode()).body(e.getMessage());
+    }
+
+    @ExceptionHandler(ErrorResponseException.class)
+    public ResponseEntity<String> handleNotFound(ErrorResponseException e) {
         return ResponseEntity.status(e.getStatusCode()).body(e.getMessage());
     }
 
