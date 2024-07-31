@@ -12,13 +12,11 @@ import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.Query;
 import reactor.core.publisher.Mono;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 import static net.burndmg.eschallenges.data.model.TimestampBasedSortable.TIMESTAMP_FIELD;
 import static net.burndmg.eschallenges.infrastructure.util.RepositoryProjectionUtil.queryBuilderWithProjectionFor;
 import static org.springframework.util.CollectionUtils.isEmpty;
-
 
 @RequiredArgsConstructor
 public class PaginationRepositoryImpl<ENTITY extends TimestampBasedSortable> implements PaginationRepository<ENTITY> {
@@ -50,11 +48,8 @@ public class PaginationRepositoryImpl<ENTITY extends TimestampBasedSortable> imp
     private static <T> Page<T> toPage(ReactiveSearchHits<T> result) {
         List<SearchHit<T>> hits = result.getSearchHits()
                                         .collectList()
-                                        .block();
-
-        if (hits == null) {
-            return null;
-        }
+                                        .blockOptional()
+                                        .orElse(List.of());
 
         return Page.<T>builder()
                    .result(hits.stream().map(SearchHit::getContent).toList())
@@ -64,7 +59,7 @@ public class PaginationRepositoryImpl<ENTITY extends TimestampBasedSortable> imp
                    .build();
     }
 
-    private static <T> Long toLastSortValue(@Nullable List<SearchHit<T>> hits) {
+    private static <T> Long toLastSortValue(List<SearchHit<T>> hits) {
         if (isEmpty(hits)) {
             return null;
         }
