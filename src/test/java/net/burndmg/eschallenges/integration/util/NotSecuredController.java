@@ -8,8 +8,13 @@ import reactor.core.publisher.Mono;
 public class NotSecuredController {
 
 
-    @GetMapping("not-secured-integration-test-endpoint")
+    @GetMapping("api/not-secured-integration-test-endpoint")
     public Mono<String> test() {
+        return Mono.just("You will never see this string");
+    }
+
+    @GetMapping("not-secured-and-not-api-integration-test-endpoint")
+    public Mono<String> test2() {
         return Mono.just("You will never see this string");
     }
 }

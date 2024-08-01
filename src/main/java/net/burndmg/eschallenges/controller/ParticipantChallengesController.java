@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("challenges")
+@RequestMapping("api/challenges")
 @RequiredArgsConstructor
 public class ParticipantChallengesController {
 
