@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import static net.burndmg.eschallenges.integration.util.TestUtil.withAllResult;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ChallengeAcceptanceConcurrencyIntegrationTest extends IntegrationTestBase {
@@ -87,20 +88,18 @@ public class ChallengeAcceptanceConcurrencyIntegrationTest extends IntegrationTe
         Challenge challenge = testIndexer.indexChallenge(Challenge.builder()
                                                                   .title("Find Nikola!")
                                                                   .idealRequest(request)
-                                                                  .jsonChallengeTestArray(
-                                                                          """
-                                                                            [
-                                                                                { "name": "Minh" },
-                                                                                { "name": "Khai" }
-                                                                            ]
-                                                                          """)
-                                                                 .jsonChallengeTestArray(
-                                                                            """ 
-                                                                            [
-                                                                                { "name": "Nikola" },
-                                                                                { "name": "Andrijana" }
-                                                                            ]
-                                                                            """)
+                                                                  .test(withAllResult("""
+                                                                                               [
+                                                                                                   { "name": "Minh" },
+                                                                                                   { "name": "Khai" }
+                                                                                               ]
+                                                                                             """))
+                                                                  .test(withAllResult("""
+                                                                                             [
+                                                                                                 { "name": "Nikola" },
+                                                                                                 { "name": "Andrijana" }
+                                                                                             ]
+                                                                                             """))
                                                                   .build());
 
 

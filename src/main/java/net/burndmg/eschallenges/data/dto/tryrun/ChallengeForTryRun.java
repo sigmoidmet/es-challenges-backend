@@ -1,9 +1,7 @@
 package net.burndmg.eschallenges.data.dto.tryrun;
 
-import java.util.Map;
-
 public record ChallengeForTryRun (
-        Map<String, Object> indexSettings,
+        String jsonIndexMappings,
         String idealRequest,
-        boolean ordered
+        boolean expectsTheSameOrder
 ) {}

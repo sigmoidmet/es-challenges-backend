@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import net.burndmg.eschallenges.data.model.Challenge;
 import net.burndmg.eschallenges.data.model.ChallengeExample;
+import net.burndmg.eschallenges.data.model.ChallengeTest;
 import org.springframework.boot.test.context.TestComponent;
 import org.springframework.data.elasticsearch.core.RefreshPolicy;
 
@@ -17,6 +18,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static net.burndmg.eschallenges.integration.util.TestUtil.withEmptyResult;
 
 
 @TestComponent
@@ -80,16 +83,28 @@ public class TestIndexer {
 
     public Challenge.ChallengeBuilder randomChallenge(String id) {
         return Challenge.builder()
-                         .id(id)
-                         .title(UUID.randomUUID().toString())
-                         .description(UUID.randomUUID().toString())
-                         .jsonChallengeTestArray(UUID.randomUUID().toString())
-                         .jsonChallengeTestArray(UUID.randomUUID().toString())
-                         .idealRequest(UUID.randomUUID().toString())
-                         .jsonIndexSettings(UUID.randomUUID().toString())
-                         .ordered(ThreadLocalRandom.current().nextBoolean())
-                         .examples(List.of(new ChallengeExample(UUID.randomUUID().toString(),
-                                                                UUID.randomUUID().toString(),
-                                                                UUID.randomUUID().toString())));
+                        .id(id)
+                        .title(UUID.randomUUID().toString())
+                        .description(UUID.randomUUID().toString())
+                        .test(randomTest())
+                        .test(randomTest())
+                        .idealRequest("""
+                                      {
+                                          "query": {
+                                              "term": {
+                                                  "NOT_EXISTING_FIELD": "NOT_EXISTING_VALUE"
+                                              }
+                                          }
+                                      }
+                                      """)
+                        .jsonIndexMappings("{}")
+                        .expectsTheSameOrder(ThreadLocalRandom.current().nextBoolean())
+                        .examples(List.of(new ChallengeExample(UUID.randomUUID().toString(),
+                                                               UUID.randomUUID().toString(),
+                                                               UUID.randomUUID().toString())));
+    }
+
+    private ChallengeTest randomTest() {
+        return withEmptyResult(String.format("[ { \"%s\": \"%s\" } ]", UUID.randomUUID(), UUID.randomUUID()));
     }
 }

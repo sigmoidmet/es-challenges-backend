@@ -20,14 +20,12 @@ public record Challenge (
 
         String description,
 
-        String jsonIndexSettings,
+        String jsonIndexMappings,
 
         String idealRequest,
 
-        boolean ordered,
-
         @Singular
-        List<String> jsonChallengeTestArrays,
+        List<ChallengeTest> tests,
 
         @Field(type = FieldType.Object)
         List<ChallengeExample> examples,

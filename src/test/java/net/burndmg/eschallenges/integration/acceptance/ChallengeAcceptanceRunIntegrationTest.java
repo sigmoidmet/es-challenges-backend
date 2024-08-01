@@ -2,9 +2,12 @@ package net.burndmg.eschallenges.integration.acceptance;
 
 import net.burndmg.eschallenges.data.dto.run.RunRequest;
 import net.burndmg.eschallenges.data.model.Challenge;
+import net.burndmg.eschallenges.data.model.ChallengeTest;
 import net.burndmg.eschallenges.integration.util.IntegrationTestBase;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithMockUser;
+
+import static net.burndmg.eschallenges.integration.util.TestUtil.withEmptyResult;
 
 @WithMockUser(username = "user")
 public class ChallengeAcceptanceRunIntegrationTest extends IntegrationTestBase {
@@ -26,51 +29,50 @@ public class ChallengeAcceptanceRunIntegrationTest extends IntegrationTestBase {
 
         Challenge challenge = testIndexer.indexChallenge(Challenge.builder()
                                                                   .title("Find Dmitry!")
-                                                                  .jsonChallengeTestArray("""
-                                                                                            [
-                                                                                                { "name": "Dmitry" },
-                                                                                                { "name": "Maria" }
-                                                                                            ]
-                                                                                          """)
-                                                                  .jsonChallengeTestArray("""
-                                                                                            [
-                                                                                                { "name": "Alyona" },
-                                                                                                { "name": "Anna" },
-                                                                                                { "name": "Maria" },
-                                                                                                { "name": "Tatyana" },
-                                                                                                { "name": "Dmitry" },
-                                                                                                { "name": "Maria" }
-                                                                                            ]
-                                                                                          """)
-                                                                  .jsonChallengeTestArray("""
-                                                                                            [
-                                                                                                { "name": "Alyona" },
-                                                                                                { "name": "Anna" },
-                                                                                                { "name": "Maria" },
-                                                                                                { "name": "Tatyana" },
-                                                                                                { "name": "Dmitry" },
-                                                                                                { "name": "Maria" }
-                                                                                            ]
-                                                                                          """)
-                                                                  .jsonChallengeTestArray("""
-                                                                                            [
-                                                                                                { "name": "Alexander" },
-                                                                                                { "name": "Anna" },
-                                                                                                { "name": "Maria" },
-                                                                                                { "name": "Dmitry" },
-                                                                                                { "name": "Maria" }
-                                                                                            ]
-                                                                                          """)
-                                                                  .jsonChallengeTestArray("""
-                                                                                            [
-                                                                                                { "name": "Andrijana" },
-                                                                                                { "name": "Milos" },
-                                                                                                { "name": "Nikola" },
-                                                                                                { "name": "Mina" },
-                                                                                                { "name": "Petar" }
-                                                                                            ]
-                                                                                          """)
-                                                                  .idealRequest(request)
+                                                                  .test(withDmitryResult("""
+                                                                                           [
+                                                                                               { "name": "Dmitry" },
+                                                                                               { "name": "Maria" }
+                                                                                           ]
+                                                                                         """))
+                                                                  .test(withDmitryResult("""
+                                                                                           [
+                                                                                               { "name": "Alyona" },
+                                                                                               { "name": "Anna" },
+                                                                                               { "name": "Maria" },
+                                                                                               { "name": "Tatyana" },
+                                                                                               { "name": "Dmitry" },
+                                                                                               { "name": "Maria" }
+                                                                                           ]
+                                                                                         """))
+                                                                  .test(withDmitryResult("""
+                                                                                           [
+                                                                                               { "name": "Alyona" },
+                                                                                               { "name": "Anna" },
+                                                                                               { "name": "Maria" },
+                                                                                               { "name": "Tatyana" },
+                                                                                               { "name": "Dmitry" },
+                                                                                               { "name": "Maria" }
+                                                                                           ]
+                                                                                         """))
+                                                                  .test(withDmitryResult("""
+                                                                                           [
+                                                                                               { "name": "Alexander" },
+                                                                                               { "name": "Anna" },
+                                                                                               { "name": "Maria" },
+                                                                                               { "name": "Dmitry" },
+                                                                                               { "name": "Maria" }
+                                                                                           ]
+                                                                                         """))
+                                                                  .test(withEmptyResult("""
+                                                                                          [
+                                                                                              { "name": "Andrijana" },
+                                                                                              { "name": "Milos" },
+                                                                                              { "name": "Nikola" },
+                                                                                              { "name": "Mina" },
+                                                                                              { "name": "Petar" }
+                                                                                          ]
+                                                                                        """))
                                                                   .build());
 
 
@@ -81,6 +83,10 @@ public class ChallengeAcceptanceRunIntegrationTest extends IntegrationTestBase {
                 .jsonPath("$.request").isEqualTo(request)
                 .jsonPath("$.successful").isEqualTo(true)
                 .jsonPath("$.failedTest").doesNotExist();
+    }
+
+    private ChallengeTest withDmitryResult(String jsonTestArray) {
+        return withNameResult(jsonTestArray, "Dmitry");
     }
 
     @Test
@@ -106,32 +112,21 @@ public class ChallengeAcceptanceRunIntegrationTest extends IntegrationTestBase {
 
         Challenge challenge = testIndexer.indexChallenge(Challenge.builder()
                                                                   .title("Find Dmitry!")
-                                                                  .jsonChallengeTestArray("""
-                                                                                            [
-                                                                                                { "name": "Dmitry" },
-                                                                                                { "name": "Maria" }
-                                                                                            ]
-                                                                                          """)
-                                                                  .jsonChallengeTestArray("""
-                                                                                            [
-                                                                                                { "name": "Andrijana" },
-                                                                                                { "name": "Milos" },
-                                                                                                { "name": "Nikola" },
-                                                                                                { "name": "Mina" },
-                                                                                                { "name": "Petar" }
-                                                                                            ]
-                                                                                          """)
-                                                                  .idealRequest("""
-                                                                                 {
-                                                                                     "query": {
-                                                                                       "term": {
-                                                                                         "name.keyword": {
-                                                                                           "value": "Maria"
-                                                                                         }
-                                                                                       }
-                                                                                     }
-                                                                                 }
-                                                                                """)
+                                                                  .test(withNameResult("""
+                                                                                         [
+                                                                                             { "name": "Dmitry" },
+                                                                                             { "name": "Maria" }
+                                                                                         ]
+                                                                                       """, "Maria"))
+                                                                  .test(withEmptyResult("""
+                                                                                          [
+                                                                                              { "name": "Andrijana" },
+                                                                                              { "name": "Milos" },
+                                                                                              { "name": "Nikola" },
+                                                                                              { "name": "Mina" },
+                                                                                              { "name": "Petar" }
+                                                                                          ]
+                                                                                        """))
                                                                   .build());
 
 
@@ -142,6 +137,19 @@ public class ChallengeAcceptanceRunIntegrationTest extends IntegrationTestBase {
                 .jsonPath("$.request").isEqualTo(runRequest.request())
                 .jsonPath("$.successful").isEqualTo(true)
                 .jsonPath("$.failedTest").doesNotExist();
+    }
+
+    private ChallengeTest withNameResult(String jsonTestArray, String nameValue) {
+        return new ChallengeTest(
+                jsonTestArray,
+                String.format("""
+                              [
+                                  {
+                                      "name": "%s"
+                                  }
+                              ]
+                              """, nameValue)
+        );
     }
 
     @Test
@@ -166,41 +174,45 @@ public class ChallengeAcceptanceRunIntegrationTest extends IntegrationTestBase {
 
         Challenge challenge = testIndexer.indexChallenge(Challenge.builder()
                                                                   .title("Find interns!")
-                                                                  .idealRequest("""
-                                                                                  {
-                                                                                      "query": {
-                                                                                        "term": {
-                                                                                          "position.keyword": {
-                                                                                            "value": "intern"
-                                                                                          }
-                                                                                        }
-                                                                                      }
-                                                                                  }
-                                                                                 """)
-                                                                  .jsonChallengeTestArray("""
-                                                                                            [
-                                                                                                {
-                                                                                                    "name": "Andrijana",
-                                                                                                    "position": "intern"
-                                                                                                },
-                                                                                                {
-                                                                                                    "name": "Nikola",
-                                                                                                    "position": "intern"
-                                                                                                },
-                                                                                                {
-                                                                                                    "name": "Dmitry",
-                                                                                                    "position": "T3"
-                                                                                                }
-                                                                                            ]
-                                                                                          """)
-                                                                  .jsonChallengeTestArray("""
-                                                                                            [
-                                                                                                {
-                                                                                                    "name": "Dmitry",
-                                                                                                    "position": "T3"
-                                                                                                }
-                                                                                            ]
-                                                                                          """)
+                                                                  .test(new ChallengeTest(
+                                                                          """
+                                                                            [
+                                                                                {
+                                                                                    "name": "Andrijana",
+                                                                                    "position": "intern"
+                                                                                },
+                                                                                {
+                                                                                    "name": "Nikola",
+                                                                                    "position": "intern"
+                                                                                },
+                                                                                {
+                                                                                    "name": "Dmitry",
+                                                                                    "position": "T3"
+                                                                                }
+                                                                            ]
+                                                                          """,
+                                                                          """
+                                                                            [
+                                                                                {
+                                                                                    "name": "Andrijana",
+                                                                                    "position": "intern"
+                                                                                },
+                                                                                {
+                                                                                    "name": "Nikola",
+                                                                                    "position": "intern"
+                                                                                }
+                                                                            ]
+                                                                          """
+                                                                  ))
+
+                                                                  .test(withEmptyResult("""
+                                                                                          [
+                                                                                              {
+                                                                                                  "name": "Dmitry",
+                                                                                                  "position": "T3"
+                                                                                              }
+                                                                                          ]
+                                                                                        """))
                                                                   .build());
 
 

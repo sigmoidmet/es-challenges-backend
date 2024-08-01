@@ -7,6 +7,8 @@ import net.burndmg.eschallenges.integration.util.IntegrationTestBase;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithMockUser;
 
+import static net.burndmg.eschallenges.integration.util.TestUtil.withAllResult;
+
 @WithMockUser
 public class ChallengeAcceptanceOrderingTest extends IntegrationTestBase {
 
@@ -56,7 +58,7 @@ public class ChallengeAcceptanceOrderingTest extends IntegrationTestBase {
                                                                                     "sort": [ { "name.keyword": "asc" } ]
                                                                                 }
                                                                                 """)
-                                                                  .ordered(true)
+                                                                  .expectsTheSameOrder(true)
                                                                   .build());
 
 
@@ -85,7 +87,7 @@ public class ChallengeAcceptanceOrderingTest extends IntegrationTestBase {
                                                                                     "sort": [ { "name.keyword": "asc" } ]
                                                                                 }
                                                                                 """)
-                                                                  .ordered(true)
+                                                                  .expectsTheSameOrder(true)
                                                                   .build());
 
 
@@ -103,13 +105,13 @@ public class ChallengeAcceptanceOrderingTest extends IntegrationTestBase {
 
         Challenge challenge = testIndexer.indexChallenge(Challenge.builder()
                                                                   .title("Find All!")
-                                                                  .jsonChallengeTestArray("""
-                                                                                            [
-                                                                                                { "name": "Dmitry" },
-                                                                                                { "name": "Maria" }
-                                                                                            ]
-                                                                                          """)
-                                                                  .jsonChallengeTestArray("""
+                                                                  .test(withAllResult("""
+                                                                                               [
+                                                                                                   { "name": "Dmitry" },
+                                                                                                   { "name": "Maria" }
+                                                                                               ]
+                                                                                             """))
+                                                                  .test(withAllResult("""
                                                                                             [
                                                                                                 { "name": "Andrijana" },
                                                                                                 { "name": "Milos" },
@@ -117,10 +119,7 @@ public class ChallengeAcceptanceOrderingTest extends IntegrationTestBase {
                                                                                                 { "name": "Mina" },
                                                                                                 { "name": "Petar" }
                                                                                             ]
-                                                                                          """)
-                                                                  .idealRequest("""
-                                                                                 {}
-                                                                                """)
+                                                                                          """))
                                                                   .build());
 
 
@@ -138,27 +137,22 @@ public class ChallengeAcceptanceOrderingTest extends IntegrationTestBase {
 
         Challenge challenge = testIndexer.indexChallenge(Challenge.builder()
                                                                   .title("Find All!")
-                                                                  .jsonChallengeTestArray("""
+                                                                  .test(withAllResult("""
                                                                                             [
                                                                                                 { "name": "Dmitry" },
                                                                                                 { "name": "Maria" }
                                                                                             ]
-                                                                                          """)
-                                                                  .jsonChallengeTestArray("""
+                                                                                          """))
+                                                                  .test(withAllResult("""
                                                                                             [
-                                                                                                { "name": "Andrijana" },
-                                                                                                { "name": "Milos" },
-                                                                                                { "name": "Nikola" },
-                                                                                                { "name": "Mina" },
-                                                                                                { "name": "Petar" }
+                                                                                                { "name": "A1" },
+                                                                                                { "name": "B2" },
+                                                                                                { "name": "C3" },
+                                                                                                { "name": "D4" },
+                                                                                                { "name": "E5" }
                                                                                             ]
-                                                                                          """)
-                                                                  .idealRequest("""
-                                                                                 {
-                                                                                    "sort": [ { "name.keyword": "asc" } ]
-                                                                                 }
-                                                                                """)
-                                                                  .ordered(true)
+                                                                                          """))
+                                                                  .expectsTheSameOrder(true)
                                                                   .build());
 
 
@@ -170,33 +164,29 @@ public class ChallengeAcceptanceOrderingTest extends IntegrationTestBase {
     void run_whenOrderedWithResultInAnotherOrder_shouldBeFalse() {
         RunRequest runRequest = new RunRequest("""
                                                {
-                                                 "sort": [ { "name.keyword": "asc" } ]
+                                                 "sort": [ { "name.keyword": "desc" } ]
                                                }
                                                """);
 
         Challenge challenge = testIndexer.indexChallenge(Challenge.builder()
                                                                   .title("Find All!")
-                                                                  .jsonChallengeTestArray("""
+                                                                  .test(withAllResult("""
                                                                                             [
                                                                                                 { "name": "Dmitry" },
                                                                                                 { "name": "Maria" }
                                                                                             ]
-                                                                                          """)
-                                                                  .jsonChallengeTestArray("""
+                                                                                          """))
+                                                                  .test(withAllResult("""
                                                                                             [
-                                                                                                { "name": "Andrijana" },
-                                                                                                { "name": "Milos" },
-                                                                                                { "name": "Nikola" },
-                                                                                                { "name": "Mina" },
-                                                                                                { "name": "Petar" }
+                                                                                                { "name": "A1" },
+                                                                                                { "name": "B2" },
+                                                                                                { "name": "C3" },
+                                                                                                { "name": "D4" },
+                                                                                                { "name": "E5" }
                                                                                             ]
-                                                                                          """)
-                                                                  .idealRequest("""
-                                                                                 {
-                                                                                    "sort": [ { "name.keyword": "desc" } ]
-                                                                                 }
-                                                                                """)
-                                                                  .ordered(true)
+                                                                                          """))
+
+                                                                  .expectsTheSameOrder(true)
                                                                   .build());
 
 

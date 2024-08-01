@@ -6,8 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 @Builder
-public record ChallengeRunResult(
-        List<Map<String, Object>> indexedDataJson,
+public record ChallengeRunResult (
+        List<Map<String, Object>> actualResult,
         List<Map<String, Object>> expectedResult,
-        List<Map<String, Object>> actualResult
+        List<Map<String, Object>> runData,
+        boolean isSuccessful
 ) {}

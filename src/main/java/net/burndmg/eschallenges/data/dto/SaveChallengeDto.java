@@ -1,22 +1,32 @@
 package net.burndmg.eschallenges.data.dto;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Singular;
 import net.burndmg.eschallenges.data.model.ChallengeExample;
-import net.burndmg.eschallenges.data.model.ChallengeTest;
 
 import java.util.List;
 
 @Builder
-public record ChallengeDto (
+public record SaveChallengeDto (
+
+        @NotNull
         String title,
+
+        @NotNull
         String description,
+
+        @NotNull
         String jsonIndexMappings,
+
+        @NotNull
         String idealRequest,
 
         @Singular
         List<ChallengeExample> examples,
 
+        @NotEmpty
         @Singular
-        List<ChallengeTest> tests
+        List<String> jsonTestArrays
 ) {}
