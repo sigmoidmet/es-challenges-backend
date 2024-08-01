@@ -15,7 +15,7 @@ import static net.burndmg.eschallenges.infrastructure.config.security.SecurityAu
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("challenges")
+@RequestMapping("api/challenges")
 @PreAuthorize("hasAuthority('" + CHALLENGE_MANAGEMENT_PRIVILEGE + "')")
 public class ChallengeManagementController {
 

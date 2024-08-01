@@ -29,8 +29,9 @@ public class SecurityConfig {
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     SecurityWebFilterChain filterChain(ServerHttpSecurity http) {
-        // permit here but we will reject everything in customAuthorize
-        return http.authorizeExchange(registry -> registry.anyExchange().permitAll())
+        // permit /api here, but we will reject everything in customAuthorize
+        return http.authorizeExchange(registry -> registry.pathMatchers("/api/**").permitAll()
+                                                          .anyExchange().denyAll())
                    .csrf(ServerHttpSecurity.CsrfSpec::disable)
                    .build();
     }

@@ -4,7 +4,6 @@ import net.burndmg.eschallenges.data.dto.participant.ParticipantChallengePage;
 import net.burndmg.eschallenges.data.model.Challenge;
 import net.burndmg.eschallenges.integration.util.IntegrationTestBase;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -82,15 +81,7 @@ public class ParticipantChallengesControllerIntegrationTest extends IntegrationT
         testIndexer.indexRandomChallengeAndReturnIt("1");
         testIndexer.indexRandomChallengeAndReturnIt("2");
 
-        ParticipantChallengePage firstResponseBody = webTestClient
-                .get()
-                .uri("/challenges")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().is2xxSuccessful()
-                .expectBody(ParticipantChallengePage.class)
-                .returnResult()
-                .getResponseBody();
+        ParticipantChallengePage firstResponseBody = getSuccessful("/challenges", ParticipantChallengePage.class);
 
         assertNotNull(firstResponseBody);
 

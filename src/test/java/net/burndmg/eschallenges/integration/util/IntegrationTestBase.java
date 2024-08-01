@@ -41,7 +41,7 @@ public abstract class IntegrationTestBase implements ElasticsearchAware {
     protected WebTestClient.ResponseSpec get(String path) {
         return webTestClient
                 .get()
-                .uri(path)
+                .uri("/api" + path)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange();
     }
@@ -63,7 +63,7 @@ public abstract class IntegrationTestBase implements ElasticsearchAware {
     protected WebTestClient.ResponseSpec post(String path, Object body) {
         return webTestClient
                 .post()
-                .uri(path)
+                .uri("/api" + path)
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(body)
                 .exchange();
@@ -86,7 +86,7 @@ public abstract class IntegrationTestBase implements ElasticsearchAware {
     protected WebTestClient.ResponseSpec put(String path, Object body) {
         return webTestClient
                 .put()
-                .uri(path)
+                .uri("/api" + path)
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(body)
                 .exchange();

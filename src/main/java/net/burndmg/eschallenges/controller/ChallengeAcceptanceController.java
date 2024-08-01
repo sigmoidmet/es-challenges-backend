@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("challenges/{id}/acceptances")
+@RequestMapping("api/challenges/{id}/acceptances")
 @RequiredArgsConstructor
 public class ChallengeAcceptanceController {
 
