@@ -10,6 +10,7 @@ import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchCl
 import org.springframework.data.elasticsearch.core.ReactiveElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ReactiveIndexOperations;
 import org.springframework.data.elasticsearch.core.RefreshPolicy;
+import org.springframework.data.elasticsearch.core.document.Document;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
@@ -28,15 +29,15 @@ public class ChallengeRunRepositoryImpl implements ChallengeRunRepository {
 
 
     @Override
-    public Mono<Boolean> createIndex(String indexName, @Nullable Map<String, Object> indexSettings) {
+    public Mono<Boolean> createIndex(String indexName, @Nullable Map<String, Object> indexMappings) {
         ReactiveIndexOperations indexOperations = elasticsearchOperations.indexOps(IndexCoordinates.of(indexName));
 
-        if (indexSettings == null) {
+        if (indexMappings == null) {
             return indexOperations.create();
         }
 
 
-        return indexOperations.create(indexSettings);
+        return indexOperations.create(Map.of(), Document.from(indexMappings));
     }
 
     @Override

@@ -5,12 +5,17 @@ import net.burndmg.eschallenges.infrastructure.expection.instance.ApiException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.ErrorResponseException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@ControllerAdvice
+import java.util.HashMap;
+import java.util.Map;
+
+@RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
 
@@ -24,19 +29,28 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(e.getStatusCode()).body(e.getMessage());
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<String> handleArgumentNotValidException(MethodArgumentNotValidException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
+    public Map<String, String> handleArgumentNotValidException(MethodArgumentNotValidException e) {
+        Map<String, String> errors = new HashMap<>();
+        e.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
     }
 
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<String> handleAccessDeniedException(AccessDeniedException e) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+    public String handleAccessDeniedException(AccessDeniedException e) {
+        return e.getMessage();
     }
 
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleRestOfExceptions(Exception e) {
+    public String handleRestOfExceptions(Exception e) {
         log.error("Something went wrong", e);
-        return ResponseEntity.internalServerError().body("Something went wrong!");
+        return "Something went wrong!";
     }
 }

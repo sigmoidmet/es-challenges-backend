@@ -1,9 +1,15 @@
 package net.burndmg.eschallenges.data.model;
 
 
+import jakarta.validation.constraints.NotNull;
+
 public record ChallengeExample (
 
-    String testDataJson,
-    String expectedResult,
-    String explanation
+        @NotNull
+        String testDataJson,
+
+        @NotNull
+        String expectedResult,
+
+        String explanation
 ) {}

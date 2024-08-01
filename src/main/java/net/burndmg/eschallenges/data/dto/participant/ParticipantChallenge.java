@@ -9,6 +9,6 @@ public record ParticipantChallenge (
         String title,
         String description,
         List<ChallengeExample> examples,
-        String jsonIndexSettings
+        String jsonIndexMappings
 ) {
 }
