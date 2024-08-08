@@ -1,13 +1,11 @@
 package net.burndmg.eschallenges.data.dto.tryrun;
 
 import lombok.Builder;
-
-import java.util.List;
-import java.util.Map;
+import net.burndmg.eschallenges.data.dto.run.RunSearchResponse;
 
 @Builder
 public record TryRunResponse (
-        List<Map<String, Object>> expectedResponse,
-        List<Map<String, Object>> actualResponse,
+        RunSearchResponse expectedResponse,
+        RunSearchResponse actualResponse,
         boolean isSuccessful
 ) {}

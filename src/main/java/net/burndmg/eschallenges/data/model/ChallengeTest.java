@@ -1,4 +1,3 @@
 package net.burndmg.eschallenges.data.model;
 
-public record ChallengeTest(String jsonTestArray, String jsonExpectedResultArray) {
-}
+public record ChallengeTest(String jsonTestArray, RunSearchResponseJson expectedResult) {}

@@ -1,5 +1,6 @@
-package net.burndmg.eschallenges.repository;
+package net.burndmg.eschallenges.repository.run;
 
+import net.burndmg.eschallenges.data.dto.run.RunSearchResponse;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -13,5 +14,5 @@ public interface ChallengeRunRepository {
 
     Mono<Void> saveAll(String indexName, List<Map<String, Object>> indexedData);
 
-    Mono<List<Map<String, Object>>> search(String indexName, String searchRequest);
+    Mono<RunSearchResponse> search(String indexName, String searchRequest);
 }

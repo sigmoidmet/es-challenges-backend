@@ -9,8 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import java.util.List;
-
 import static net.burndmg.eschallenges.infrastructure.config.security.SecurityAuthority.CHALLENGE_MANAGEMENT_PRIVILEGE;
 import static net.burndmg.eschallenges.integration.util.TestUtil.withAllResult;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,12 +33,13 @@ public class CreateChallengeIntegrationTest extends IntegrationTestBase {
 
         var createResponse = postSuccessful("/challenges", challenge, SaveChallengeResponse.class);
 
-        assertEquals(List.of(withAllResult(challenge.jsonTestArrays().get(0))), createResponse.testsWithResults());
+        assertEquals(1, createResponse.testsWithResults().size());
+        assertEquals(expectedGeneratedTest, createResponse.testsWithResults().get(0));
 
         getSuccessful("/challenges/" + createResponse.id())
                 .jsonPath("$.title").isEqualTo(challenge.title())
                 .jsonPath("$.tests[0].jsonTestArray").isEqualTo(expectedGeneratedTest.jsonTestArray())
-                .jsonPath("$.tests[0].jsonExpectedResultArray").isEqualTo(expectedGeneratedTest.jsonExpectedResultArray())
+                .jsonPath("$.tests[0].expectedResult.hitsJsonArray").isEqualTo(expectedGeneratedTest.expectedResult().hitsJsonArray())
                 .jsonPath("$.idealRequest").isEqualTo(challenge.idealRequest())
                 .jsonPath("$.examples[0].testDataJson").isEqualTo(challenge.examples().get(0).testDataJson())
                 .jsonPath("$.examples[0].expectedResult").isEqualTo(challenge.examples().get(0).expectedResult())

@@ -7,8 +7,10 @@ import net.burndmg.eschallenges.data.dto.SaveChallengeDto;
 import net.burndmg.eschallenges.data.dto.SaveChallengeResponse;
 import net.burndmg.eschallenges.data.dto.TestsUpdate;
 import net.burndmg.eschallenges.data.dto.run.ChallengeRunConfiguration;
+import net.burndmg.eschallenges.data.dto.run.RunSearchResponse;
 import net.burndmg.eschallenges.data.model.Challenge;
 import net.burndmg.eschallenges.data.model.ChallengeTest;
+import net.burndmg.eschallenges.data.model.RunSearchResponseJson;
 import net.burndmg.eschallenges.infrastructure.expection.instance.NotFoundException;
 import net.burndmg.eschallenges.infrastructure.util.JsonUtil;
 import net.burndmg.eschallenges.infrastructure.util.JsonsDiscriminator;
@@ -61,8 +63,8 @@ public class ChallengeManagementService {
                                                          String username,
                                                          TestsUpdate testsUpdate) {
         return createTestsWithResults(testsUpdate.jsonTestArraysWithoutResults(), challenge, username)
-                .map(runTests -> challengeMapper.toModel(id, challenge, merge(testsUpdate.existingTestsWithResults(),
-                                                                              runTests)));
+                .map(runTests -> merge(testsUpdate.existingTestsWithResults(), runTests))
+                .map(tests -> challengeMapper.toModel(id, challenge, tests));
     }
 
     private Mono<List<ChallengeTest>> createTestsWithResults(Collection<String> jsonTestArrays,
@@ -82,7 +84,12 @@ public class ChallengeManagementService {
                                                             .indexMappings(objectMapper.fromJson(challenge.jsonIndexMappings()))
                                                             .request(challenge.idealRequest())
                                                             .build())
-                              .map(result -> new ChallengeTest(jsonTestArray, objectMapper.writeValueAsString(result)));
+                              .map(result -> new ChallengeTest(jsonTestArray, toJson(result)));
+    }
+
+    private RunSearchResponseJson toJson(RunSearchResponse response) {
+        return new RunSearchResponseJson(objectMapper.writeValueAsString(response.hits()),
+                                         objectMapper.writeValueAsString(response.aggregations()));
     }
 
     private List<ChallengeTest> merge(Collection<ChallengeTest> existingTests, Collection<ChallengeTest> runTests) {

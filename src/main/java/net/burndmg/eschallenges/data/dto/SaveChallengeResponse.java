@@ -4,7 +4,7 @@ import net.burndmg.eschallenges.data.model.ChallengeTest;
 
 import java.util.List;
 
-public record SaveChallengeResponse(
+public record SaveChallengeResponse (
         String id,
         List<ChallengeTest> testsWithResults
 ) {}

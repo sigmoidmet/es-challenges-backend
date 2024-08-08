@@ -13,6 +13,7 @@ import java.util.List;
 
 import static net.burndmg.eschallenges.infrastructure.config.security.SecurityAuthority.CHALLENGE_MANAGEMENT_PRIVILEGE;
 import static net.burndmg.eschallenges.integration.util.TestUtil.withEmptyResult;
+import static net.burndmg.eschallenges.integration.util.TestUtil.withoutAggregations;
 
 public class UpdateChallengeIntegrationTest extends IntegrationTestBase {
 
@@ -37,17 +38,17 @@ public class UpdateChallengeIntegrationTest extends IntegrationTestBase {
                 .jsonPath("$.id").isEqualTo(indexedChallenge.id())
 
                 .jsonPath("$.testsWithResults[0].jsonTestArray").isEqualTo(indexedChallenge.tests().get(0).jsonTestArray())
-                .jsonPath("$.testsWithResults[0].jsonExpectedResultArray").isEqualTo("[]")
+                .jsonPath("$.testsWithResults[0].expectedResult.hitsJsonArray").isEqualTo("[]")
 
                 .jsonPath("$.testsWithResults[1].jsonTestArray").isEqualTo(updateChallenge.jsonTestArrays().get(1))
-                .jsonPath("$.testsWithResults[1].jsonExpectedResultArray").isEqualTo("[]");
+                .jsonPath("$.testsWithResults[1].expectedResult.hitsJsonArray").isEqualTo("[]");
 
         getSuccessful("/challenges/" + indexedChallenge.id())
                 .jsonPath("$.title").isEqualTo(updateChallenge.title())
                 .jsonPath("$.tests[0].jsonTestArray").isEqualTo(indexedChallenge.tests().get(0).jsonTestArray())
-                .jsonPath("$.tests[0].jsonExpectedResultArray").isEqualTo(indexedChallenge.tests().get(0).jsonExpectedResultArray())
+                .jsonPath("$.tests[0].expectedResult.hitsJsonArray").isEqualTo(indexedChallenge.tests().get(0).expectedResult().hitsJsonArray())
                 .jsonPath("$.tests[1].jsonTestArray").isEqualTo(updateChallenge.jsonTestArrays().get(1))
-                .jsonPath("$.tests[1].jsonExpectedResultArray").isEqualTo("[]")
+                .jsonPath("$.tests[1].expectedResult.hitsJsonArray").isEqualTo("[]")
                 .jsonPath("$.idealRequest").isEqualTo(updateChallenge.idealRequest())
                 .jsonPath("$.examples[0].testDataJson").isEqualTo(updateChallenge.examples().get(0).testDataJson())
                 .jsonPath("$.examples[0].expectedResult").isEqualTo(updateChallenge.examples().get(0).expectedResult())
@@ -92,10 +93,10 @@ public class UpdateChallengeIntegrationTest extends IntegrationTestBase {
                 .jsonPath("$.id").isEqualTo(indexedChallenge.id())
 
                 .jsonPath("$.testsWithResults[0].jsonTestArray").isEqualTo(updateChallenge.jsonTestArrays().get(0))
-                .jsonPath("$.testsWithResults[0].jsonExpectedResultArray").isEqualTo("[{\"name\":\"cat\"}]")
+                .jsonPath("$.testsWithResults[0].expectedResult.hitsJsonArray").isEqualTo("[{\"name\":\"cat\"}]")
 
                 .jsonPath("$.testsWithResults[1].jsonTestArray").isEqualTo(updateChallenge.jsonTestArrays().get(1))
-                .jsonPath("$.testsWithResults[1].jsonExpectedResultArray").isEqualTo("[{\"name\":\"cat\"}]");
+                .jsonPath("$.testsWithResults[1].expectedResult.hitsJsonArray").isEqualTo("[{\"name\":\"cat\"}]");
     }
 
     @Test
@@ -116,7 +117,7 @@ public class UpdateChallengeIntegrationTest extends IntegrationTestBase {
                            .clearTests()
                            .test(withEmptyResult("[ {\"name\": \"cat\"} ]"))
                            .test(new ChallengeTest("[ {\"name\": \"cat\"}, {\"name\": \"dog\"} ]",
-                                                   "[{\"name\":\"dog\"}]"))
+                                                   withoutAggregations("[{\"name\":\"dog\"}]")))
                            .build()
         );
 
@@ -140,10 +141,10 @@ public class UpdateChallengeIntegrationTest extends IntegrationTestBase {
                 .jsonPath("$.id").isEqualTo(indexedChallenge.id())
 
                 .jsonPath("$.testsWithResults[0].jsonTestArray").isEqualTo(updateChallenge.jsonTestArrays().get(0))
-                .jsonPath("$.testsWithResults[0].jsonExpectedResultArray").isEqualTo("[]")
+                .jsonPath("$.testsWithResults[0].expectedResult.hitsJsonArray").isEqualTo("[]")
 
                 .jsonPath("$.testsWithResults[1].jsonTestArray").isEqualTo(updateChallenge.jsonTestArrays().get(1))
-                .jsonPath("$.testsWithResults[1].jsonExpectedResultArray").isEqualTo("[]");
+                .jsonPath("$.testsWithResults[1].expectedResult.hitsJsonArray").isEqualTo("[]");
     }
 
     @Test

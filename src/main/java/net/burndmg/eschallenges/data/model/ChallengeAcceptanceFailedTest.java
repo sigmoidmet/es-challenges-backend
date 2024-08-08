@@ -1,6 +1,7 @@
 package net.burndmg.eschallenges.data.model;
 
 import lombok.Builder;
+import net.burndmg.eschallenges.data.dto.run.RunSearchResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,6 @@ import java.util.Map;
 public record ChallengeAcceptanceFailedTest (
 
         List<Map<String, Object>> testDataJson,
-        List<Map<String, Object>> expectedOutput,
-        List<Map<String, Object>> actualOutput
+        RunSearchResponse expectedOutput,
+        RunSearchResponse actualOutput
 ) {}

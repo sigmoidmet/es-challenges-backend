@@ -1,0 +1,11 @@
+POST _reindex
+Content-Type: application/json
+
+{
+  "source": {
+    "index": "challenges-v5"
+  },
+  "dest": {
+    "index": "challenges-v6"
+  }
+}

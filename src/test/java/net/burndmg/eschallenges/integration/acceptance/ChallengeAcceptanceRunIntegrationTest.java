@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import static net.burndmg.eschallenges.integration.util.TestUtil.withEmptyResult;
+import static net.burndmg.eschallenges.integration.util.TestUtil.withoutAggregations;
 
 @WithMockUser(username = "user")
 public class ChallengeAcceptanceRunIntegrationTest extends IntegrationTestBase {
@@ -142,13 +143,13 @@ public class ChallengeAcceptanceRunIntegrationTest extends IntegrationTestBase {
     private ChallengeTest withNameResult(String jsonTestArray, String nameValue) {
         return new ChallengeTest(
                 jsonTestArray,
-                String.format("""
+                withoutAggregations(String.format("""
                               [
                                   {
                                       "name": "%s"
                                   }
                               ]
-                              """, nameValue)
+                              """, nameValue))
         );
     }
 
@@ -191,7 +192,7 @@ public class ChallengeAcceptanceRunIntegrationTest extends IntegrationTestBase {
                                                                                 }
                                                                             ]
                                                                           """,
-                                                                          """
+                                                                          withoutAggregations("""
                                                                             [
                                                                                 {
                                                                                     "name": "Andrijana",
@@ -202,7 +203,7 @@ public class ChallengeAcceptanceRunIntegrationTest extends IntegrationTestBase {
                                                                                     "position": "intern"
                                                                                 }
                                                                             ]
-                                                                          """
+                                                                          """)
                                                                   ))
 
                                                                   .test(withEmptyResult("""
@@ -230,12 +231,12 @@ public class ChallengeAcceptanceRunIntegrationTest extends IntegrationTestBase {
                 .jsonPath("$.failedTest.testDataJson[2]['name']").isEqualTo("Dmitry")
                 .jsonPath("$.failedTest.testDataJson[2]['position']").isEqualTo("T3")
 
-                .jsonPath("$.failedTest.expectedOutput[0]['name']").isEqualTo("Andrijana")
-                .jsonPath("$.failedTest.expectedOutput[0]['position']").isEqualTo("intern")
-                .jsonPath("$.failedTest.expectedOutput[1]['name']").isEqualTo("Nikola")
-                .jsonPath("$.failedTest.expectedOutput[1]['position']").isEqualTo("intern")
+                .jsonPath("$.failedTest.expectedOutput.hits[0]['name']").isEqualTo("Andrijana")
+                .jsonPath("$.failedTest.expectedOutput.hits[0]['position']").isEqualTo("intern")
+                .jsonPath("$.failedTest.expectedOutput.hits[1]['name']").isEqualTo("Nikola")
+                .jsonPath("$.failedTest.expectedOutput.hits[1]['position']").isEqualTo("intern")
 
-                .jsonPath("$.failedTest.actualOutput[0]['name']").isEqualTo("Dmitry")
-                .jsonPath("$.failedTest.actualOutput[0]['position']").isEqualTo("T3");
+                .jsonPath("$.failedTest.actualOutput.hits[0]['name']").isEqualTo("Dmitry")
+                .jsonPath("$.failedTest.actualOutput.hits[0]['position']").isEqualTo("T3");
     }
 }
