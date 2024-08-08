@@ -1,0 +1,111 @@
+PUT /_index_template/challenges_template
+Content-Type: application/json
+
+{
+  "index_patterns": [
+    "challenges*"
+  ],
+  "priority": 1,
+  "template": {
+    "settings": {
+      "index.default_pipeline": "add-timestamp"
+    },
+    "mappings": {
+      "properties": {
+        "title": {
+          "type": "keyword",
+          "index_options": "docs",
+          "index": false,
+          "norms": false,
+          "doc_values": false
+        },
+        "description": {
+          "type": "keyword",
+          "index_options": "docs",
+          "index": false,
+          "norms": false,
+          "doc_values": false
+        },
+        "expectsTheSameOrder":  {
+          "type": "boolean",
+          "index": false,
+          "doc_values": false
+        },
+        "idealRequest": {
+          "type": "keyword",
+          "index_options": "docs",
+          "index": false,
+          "norms": false,
+          "doc_values": false
+        },
+        "indexMappings": {
+          "type": "keyword",
+          "index_options": "docs",
+          "index": false,
+          "norms": false,
+          "doc_values": false
+        },
+        "challengeTests": {
+          "type": "object",
+          "dynamic": false,
+          "properties": {
+            "jsonTestArray": {
+              "type": "keyword",
+              "index_options": "docs",
+              "index": false,
+              "norms": false,
+              "doc_values": false
+            },
+            "jsonExpectedResultArray": {
+              "type": "object",
+              "dynamic": false,
+              "properties": {
+                "hitsJsonArray": {
+                   "type": "keyword",
+                   "index_options": "docs",
+                   "index": false,
+                   "norms": false,
+                   "doc_values": false
+                },
+                "aggregationsMap": {
+                   "type": "keyword",
+                   "index_options": "docs",
+                   "index": false,
+                   "norms": false,
+                    "doc_values": false
+                }
+              }
+            }
+          }
+        },
+        "examples": {
+          "type": "object",
+          "dynamic": false,
+          "properties": {
+            "testDataJson": {
+              "type": "keyword",
+              "index_options": "docs",
+              "index": false,
+              "norms": false,
+              "doc_values": false
+            },
+            "expectedResult": {
+              "type": "keyword",
+              "index_options": "docs",
+              "index": false,
+              "norms": false,
+              "doc_values": false
+            },
+            "explanation": {
+              "type": "keyword",
+              "index_options": "docs",
+              "index": false,
+              "norms": false,
+              "doc_values": false
+            }
+          }
+        }
+      }
+    }
+  }
+}

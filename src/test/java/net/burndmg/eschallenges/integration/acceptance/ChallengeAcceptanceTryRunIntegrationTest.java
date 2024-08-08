@@ -39,8 +39,8 @@ public class ChallengeAcceptanceTryRunIntegrationTest extends IntegrationTestBas
 
 
         postSuccessful("/challenges/" + challenge.id() + "/acceptances/try-run", tryRunRequest)
-                .jsonPath("$.expectedResponse[0].name").isEqualTo(expectedName)
-                .jsonPath("$.actualResponse[0].name").isEqualTo(expectedName)
+                .jsonPath("$.expectedResponse.hits[0].name").isEqualTo(expectedName)
+                .jsonPath("$.actualResponse.hits[0].name").isEqualTo(expectedName)
                 .jsonPath("$.isSuccessful").isEqualTo("true");
     }
 
@@ -89,8 +89,8 @@ public class ChallengeAcceptanceTryRunIntegrationTest extends IntegrationTestBas
 
 
         postSuccessful("/challenges/" + challenge.id() + "/acceptances/try-run", tryRunRequest)
-                .jsonPath("$.expectedResponse[0].name").isEqualTo(expectedName)
-                .jsonPath("$.actualResponse[0].name").isEqualTo(expectedName)
+                .jsonPath("$.expectedResponse.hits[0].name").isEqualTo(expectedName)
+                .jsonPath("$.actualResponse.hits[0].name").isEqualTo(expectedName)
                 .jsonPath("$.isSuccessful").isEqualTo("true");
     }
 
@@ -138,8 +138,8 @@ public class ChallengeAcceptanceTryRunIntegrationTest extends IntegrationTestBas
 
 
         postSuccessful("/challenges/" + challenge.id() + "/acceptances/try-run", tryRunRequest)
-                .jsonPath("$.expectedResponse[0].name").isEqualTo("Andrijana")
-                .jsonPath("$.actualResponse[0].name").isEqualTo("Nikola")
+                .jsonPath("$.expectedResponse.hits[0].name").isEqualTo("Andrijana")
+                .jsonPath("$.actualResponse.hits[0].name").isEqualTo("Nikola")
                 .jsonPath("$.isSuccessful").isEqualTo("false");
     }
 

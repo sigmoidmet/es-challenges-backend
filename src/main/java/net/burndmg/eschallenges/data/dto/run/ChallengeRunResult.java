@@ -7,8 +7,8 @@ import java.util.Map;
 
 @Builder
 public record ChallengeRunResult (
-        List<Map<String, Object>> actualResult,
-        List<Map<String, Object>> expectedResult,
+        RunSearchResponse actualResult,
+        RunSearchResponse expectedResult,
         List<Map<String, Object>> runData,
         boolean isSuccessful
 ) {}

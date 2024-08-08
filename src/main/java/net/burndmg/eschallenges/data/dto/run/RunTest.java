@@ -10,7 +10,7 @@ import java.util.Map;
 public record RunTest (
         String username,
         Map<String, Object> indexMappings,
-        Mono<List<Map<String, Object>>> expectedResult,
+        Mono<RunSearchResponse> expectedResult,
         List<Map<String, Object>> jsonTestArray,
         String userRequest,
         boolean resultShouldBeOrdered

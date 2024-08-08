@@ -9,6 +9,7 @@ import net.burndmg.eschallenges.data.dto.tryrun.TryRunResponse;
 import net.burndmg.eschallenges.data.model.ChallengeAcceptance;
 import net.burndmg.eschallenges.data.model.ChallengeAcceptanceFailedTest;
 import net.burndmg.eschallenges.data.model.ChallengeTest;
+import net.burndmg.eschallenges.data.model.RunSearchResponseJson;
 import net.burndmg.eschallenges.infrastructure.expection.instance.NotFoundException;
 import net.burndmg.eschallenges.infrastructure.util.ObjectMapperWrapper;
 import net.burndmg.eschallenges.map.ChallengeAcceptanceMapper;
@@ -77,11 +78,16 @@ public class ChallengeAcceptanceService {
         return RunTest.builder()
                       .username(runData.username())
                       .indexMappings(challenge.indexSettings())
-                      .expectedResult(Mono.just(objectMapper.fromJsonList(test.jsonExpectedResultArray())))
+                      .expectedResult(Mono.just(readJson(test.expectedResult())))
                       .jsonTestArray(objectMapper.fromJsonList(test.jsonTestArray()))
                       .userRequest(runData.request())
                       .resultShouldBeOrdered(challenge.expectsTheSameOrder())
                       .build();
+    }
+
+    private RunSearchResponse readJson(RunSearchResponseJson test) {
+        return new RunSearchResponse(objectMapper.fromJsonList(test.hitsJsonArray()),
+                                     objectMapper.fromJson(test.aggregationsMap()));
     }
 
     private Mono<ChallengeRunResult> runAndValidateResults(RunTest runTest) {
@@ -93,8 +99,8 @@ public class ChallengeAcceptanceService {
     }
 
     private ChallengeRunResult withSuccessStatus(RunTest runTest,
-                                                 List<Map<String, Object>> expectedResult,
-                                                 List<Map<String, Object>> actualResult) {
+                                                 RunSearchResponse expectedResult,
+                                                 RunSearchResponse actualResult) {
         return ChallengeRunResult
                 .builder()
                 .actualResult(actualResult)
@@ -104,7 +110,7 @@ public class ChallengeAcceptanceService {
                 .build();
     }
 
-    private Mono<List<Map<String, Object>>> run(String username,
+    private Mono<RunSearchResponse> run(String username,
                                                 Map<String, Object> indexSettings,
                                                 List<Map<String, Object>> indexedData,
                                                 String request) {
@@ -118,13 +124,14 @@ public class ChallengeAcceptanceService {
         );
     }
 
-    private boolean isSuccessful(List<Map<String, Object>> expectedResult,
-                                 List<Map<String, Object>> actualResult,
+    private boolean isSuccessful(RunSearchResponse expectedResult,
+                                 RunSearchResponse actualResult,
                                  boolean resultShouldBeOrdered) {
-        if (!resultShouldBeOrdered) {
-            return CollectionUtils.isEqualCollection(expectedResult, actualResult);
-        } else {
+        if (resultShouldBeOrdered) {
             return expectedResult.equals(actualResult);
+        } else {
+            return CollectionUtils.isEqualCollection(expectedResult.hits(), actualResult.hits()) &&
+                   expectedResult.aggregations().equals(actualResult.aggregations());
         }
     }
 
