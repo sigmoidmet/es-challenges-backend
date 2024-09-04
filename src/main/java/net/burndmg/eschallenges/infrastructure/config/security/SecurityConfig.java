@@ -34,7 +34,7 @@ public class SecurityConfig {
         return http.authorizeExchange(customizer -> customizer.pathMatchers("/login/**").permitAll()
                                                               .pathMatchers("/api/**").permitAll()
                                                               .anyExchange().denyAll())
-                   .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                   .csrf(Customizer.withDefaults())
                    .oauth2Login(Customizer.withDefaults())
                    .build();
     }
