@@ -1,0 +1,27 @@
+POST /_index_template/contenders_template
+Content-Type: application/json
+
+{
+  "index_patterns": [
+    "contenders*"
+  ],
+  "priority": 1,
+  "template": {
+    "mappings": {
+      "properties": {
+        "username": {
+          "type": "keyword",
+          "index_options": "docs",
+          "index": false,
+          "norms": false
+        },
+        "authorities": {
+          "type": "keyword",
+          "index_options": "docs",
+          "index": false,
+          "norms": false
+        }
+      }
+    }
+  }
+}

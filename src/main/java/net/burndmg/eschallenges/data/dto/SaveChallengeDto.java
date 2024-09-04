@@ -26,6 +26,8 @@ public record SaveChallengeDto (
         @Singular
         List<ChallengeExample> examples,
 
+        boolean expectsTheSameOrder,
+
         @NotEmpty
         @Singular
         List<String> jsonTestArrays
