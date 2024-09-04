@@ -5,7 +5,8 @@ import org.springframework.data.elasticsearch.core.ReactiveElasticsearchOperatio
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import reactor.core.publisher.Mono;
 
-@RequiredArgsConstructor
+@SuppressWarnings("unused")
+@RequiredArgsConstructor // It's used in spring context as we implement SavingRepository which is used by our other repositories
 public class SavingRepositoryImpl<T> implements SavingRepository<T> {
 
     private final ReactiveElasticsearchOperations elasticsearchOperations;

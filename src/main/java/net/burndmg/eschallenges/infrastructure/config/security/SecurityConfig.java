@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Role;
 import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -30,9 +31,11 @@ public class SecurityConfig {
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     SecurityWebFilterChain filterChain(ServerHttpSecurity http) {
         // permit /api here, but we will reject everything in customAuthorize
-        return http.authorizeExchange(registry -> registry.pathMatchers("/api/**").permitAll()
-                                                          .anyExchange().denyAll())
+        return http.authorizeExchange(customizer -> customizer.pathMatchers("/login/**").permitAll()
+                                                              .pathMatchers("/api/**").permitAll()
+                                                              .anyExchange().denyAll())
                    .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                   .oauth2Login(Customizer.withDefaults())
                    .build();
     }
 
