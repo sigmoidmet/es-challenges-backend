@@ -8,6 +8,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 
+@SuppressWarnings("SameParameterValue") // It's a base class which is prepared for the future
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(classes = IntegrationTestConfiguration.class)
 public abstract class IntegrationTestBase implements ElasticsearchAware {
@@ -73,14 +74,6 @@ public abstract class IntegrationTestBase implements ElasticsearchAware {
         return put(path, body)
                 .expectStatus().is2xxSuccessful()
                 .expectBody();
-    }
-
-    protected <T> T putSuccessful(String path, Object body, Class<T> responseClass) {
-        return put(path, body)
-                .expectStatus().is2xxSuccessful()
-                .expectBody(responseClass)
-                .returnResult()
-                .getResponseBody();
     }
 
     protected WebTestClient.ResponseSpec put(String path, Object body) {

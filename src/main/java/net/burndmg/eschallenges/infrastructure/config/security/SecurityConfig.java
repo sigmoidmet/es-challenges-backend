@@ -34,7 +34,7 @@ public class SecurityConfig {
         return http.authorizeExchange(customizer -> customizer.pathMatchers("/login/**").permitAll()
                                                               .pathMatchers("/api/**").permitAll()
                                                               .anyExchange().denyAll())
-                   .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                   .csrf(ServerHttpSecurity.CsrfSpec::disable) // we don't need it for stateless application
                    .oauth2Login(Customizer.withDefaults())
                    .build();
     }
